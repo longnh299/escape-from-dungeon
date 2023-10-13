@@ -13,7 +13,7 @@ public class RoomNodeGraphEditor : EditorWindow
 
     private void OnEnable()
     {
-        // define layout of editor
+        // define layout of node
         roomNodeStyle = new GUIStyle();
         roomNodeStyle.normal.textColor = Color.white;
         roomNodeStyle.normal.background = EditorGUIUtility.Load("node1") as Texture2D;
