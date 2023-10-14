@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public static class HelperUtilities
@@ -22,25 +23,37 @@ public static class HelperUtilities
         bool error = false;
         int count = 0;
 
+        //Debug.Log(values);
+        
+
+        if (values == null)
+        {
+            Debug.Log(fieldName + " is null in object " + o.name.ToString());
+            //Debug.Log("oke");
+            return true;
+        }
+
         foreach (var item in values)
         {
-            if(item == null)
+            if (item == null)
             {
                 Debug.Log(fieldName + " has null values in object " + o.name.ToString());
+                //Debug.Log("oke");
                 error = true;
             }
             else
             {
                 count++;
             }
-
-            if(count == 0)
-            {
-                Debug.Log(fieldName + " hasn't any values in object " + o.name.ToString());
-                error = true;
-            }
         }
 
+        if (count == 0)
+        {
+            Debug.Log(fieldName + " hasn't any values in object " + o.name.ToString());
+            //Debug.Log("oke");
+            error = true;
+        }
+        //Debug.Log("oke1");
         return error;
     }
 }
