@@ -115,7 +115,7 @@ public class RoomNodeSO : ScriptableObject
     // process mouse up event
     private void ProcessMouseUpEvent(Event currentEvent)
     {
-        // left click down
+        // left mouse up
         if (currentEvent.button == 0)
         {
             ProcessLeftClickUpEvent(); 
@@ -135,7 +135,7 @@ public class RoomNodeSO : ScriptableObject
     private void ProcessMouseDragEvent(Event currentEvent)
     {
         // mouse drag
-        if (currentEvent.button == 0)
+        if (currentEvent.button == 0) // use left mouse drag room node
         {
             ProcessLeftMouseDragEvent(currentEvent);
         } 
