@@ -7,10 +7,15 @@ using UnityEditor.Callbacks;
 public class RoomNodeGraphEditor : EditorWindow
 {
     private GUIStyle roomNodeStyle;
+
+    // room node style attributes
     private float width = 160f;
     private float height = 80f;
     private int padding = 20;
     private int border = 10;
+
+    // line style attributes
+    private float lineWidth = 5f;
 
     private static RoomNodeGraphSO currentRoomNodeGraph;
     private RoomNodeTypeListSO roomNodeTypeList;
@@ -58,6 +63,10 @@ public class RoomNodeGraphEditor : EditorWindow
 
         if (currentRoomNodeGraph != null)
         {
+
+            // draw line if being dragged
+            DrawDraggedLine();
+
             // process event
             ProcessEvents(Event.current);
 
@@ -71,6 +80,15 @@ public class RoomNodeGraphEditor : EditorWindow
         }
     }
 
+    private void DrawDraggedLine()
+    {
+        if (currentRoomNodeGraph.linePostion != Vector2.zero)
+        {
+            // draw line from current room node to line position
+            Handles.DrawBezier(currentRoomNodeGraph.roomNodeDrawLineStart.rect.center, currentRoomNodeGraph.linePostion, currentRoomNodeGraph.roomNodeDrawLineStart.rect.center, currentRoomNodeGraph.linePostion, Color.white, null, lineWidth);
+        }
+    }
+
     private void ProcessEvents(Event currentEvent)
     {
         // get room node that mouse is over if it is null of not currently being dragged
@@ -79,8 +97,8 @@ public class RoomNodeGraphEditor : EditorWindow
             currentRoomNode = IsMouseOverRoomNode(currentEvent);
         }
 
-        // if mouse is not over on a room node
-        if (currentRoomNode == null)
+        // if mouse is not over on a room node or dragging line from room node
+        if (currentRoomNode == null || currentRoomNodeGraph.roomNodeDrawLineStart != null)
         {
             ProcessRoomNodeGraphEvents(currentEvent);
         }
@@ -112,6 +130,15 @@ public class RoomNodeGraphEditor : EditorWindow
             case EventType.MouseDown:
                 ProcessMouseDownEvent(currentEvent);
                 break;
+
+            case EventType.MouseDrag:
+                ProcessMouseDragEvent(currentEvent);
+                break;
+
+            case EventType.MouseUp:
+                ProcessMouseUpEvent(currentEvent);
+                break;
+
             default: 
                 break;
         }
@@ -133,6 +160,51 @@ public class RoomNodeGraphEditor : EditorWindow
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("Create room node"), false, CreateRoomNode, mousePosition);
         menu.ShowAsContext();
+    }
+
+    // mouse drag event
+    private void ProcessMouseDragEvent(Event currentEvent)
+    {
+        // right click to draw line
+        if (currentEvent.button == 1)
+        {
+            ProcessRightMouseDragEvent(currentEvent);
+        }
+    }
+
+    // process right mouse drag event
+    private void ProcessRightMouseDragEvent(Event currentEvent)
+    {
+        if (currentRoomNodeGraph.roomNodeDrawLineStart != null)
+        {
+           DragLine(currentEvent.delta);
+           GUI.changed = true;
+        }
+    }
+
+    // drag line method
+    private void DragLine(Vector2 delta)
+    {
+        currentRoomNodeGraph.linePostion += delta;
+    }
+
+    // process mouse up event
+    private void ProcessMouseUpEvent(Event currentEvent)
+    {
+        // if right mouse up and dragging a line
+        if (currentEvent.button == 1 && currentRoomNodeGraph.roomNodeDrawLineStart != null)
+        {
+            ClearLineDrag();
+        }
+    }
+
+    // reset drag line when mouse up
+    private void ClearLineDrag()
+    {
+        currentRoomNodeGraph.roomNodeDrawLineStart = null;
+        currentRoomNodeGraph.linePostion = Vector2.zero;
+
+        GUI.changed = true;
     }
 
     // create room node at mouse position
