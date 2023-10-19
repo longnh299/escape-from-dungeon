@@ -5,9 +5,9 @@ using UnityEditor;
 
 public class RoomNodeSO : ScriptableObject
 {
-    [HideInInspector] public string id;
-    [HideInInspector] public List<string> parentRoomNodeIds = new List<string>();
-    [HideInInspector] public List<string> childRoomNodeIds = new List<string>();
+    public string id;
+    public List<string> parentRoomNodeIds = new List<string>();
+    public List<string> childRoomNodeIds = new List<string>();
     [HideInInspector] public RoomNodeGraphSO roomNodeGraph;
     public RoomNodeTypeSO roomNodeType;
     [HideInInspector] public RoomNodeTypeListSO roomNodeTypes;
@@ -169,6 +169,19 @@ public class RoomNodeSO : ScriptableObject
         EditorUtility.SetDirty(this);
     }
 
+    // add child id to room node
+    public bool AddChildIdToRoomNode(string childId)
+    {
+        childRoomNodeIds.Add(childId);
+        return true;
+    }
+
+    // add parent id to room node
+    public bool AddParentIdToRoomNode(string parentId)
+    {
+        parentRoomNodeIds.Add(parentId);
+        return true;
+    }
 
 
 #endif

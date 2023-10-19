@@ -16,6 +16,7 @@ public class RoomNodeGraphEditor : EditorWindow
 
     // line style attributes
     private float lineWidth = 5f;
+    private float arrowSize = 6f;
 
     private static RoomNodeGraphSO currentRoomNodeGraph;
     private RoomNodeTypeListSO roomNodeTypeList;
@@ -69,6 +70,9 @@ public class RoomNodeGraphEditor : EditorWindow
 
             // process event
             ProcessEvents(Event.current);
+
+            // draw room node connection
+            DrawRoomNodeConnection();
 
             // draw room node
             DrawRoomNodes();
@@ -194,6 +198,19 @@ public class RoomNodeGraphEditor : EditorWindow
         // if right mouse up and dragging a line
         if (currentEvent.button == 1 && currentRoomNodeGraph.roomNodeDrawLineStart != null)
         {
+            // check if mouse over a room node
+            RoomNodeSO roomNode = IsMouseOverRoomNode(currentEvent);
+
+            if (roomNode != null)
+            {
+                // add room node is overed mouse to be a child of room node line start
+                if (currentRoomNodeGraph.roomNodeDrawLineStart.AddChildIdToRoomNode(roomNode.id))
+                {
+                    // add room node start line to be a parent of room node 
+                    roomNode.AddParentIdToRoomNode(currentRoomNodeGraph.roomNodeDrawLineStart.id);
+                }
+            }
+
             ClearLineDrag();
         }
     }
@@ -203,6 +220,59 @@ public class RoomNodeGraphEditor : EditorWindow
     {
         currentRoomNodeGraph.roomNodeDrawLineStart = null;
         currentRoomNodeGraph.linePostion = Vector2.zero;
+
+        GUI.changed = true;
+    }
+
+    // draw coonection of room node to other
+    private void DrawRoomNodeConnection()
+    {
+        //loop all room nodes
+        foreach(RoomNodeSO roomNode in currentRoomNodeGraph.roomNodes)
+        {
+            if (roomNode.childRoomNodeIds.Count > 0)
+            {
+                // loop all child node of roomNode
+                foreach(string childId in roomNode.childRoomNodeIds)
+                {
+                    // get child room node from dictionary
+                    if (currentRoomNodeGraph.roomNodeDictionary.ContainsKey(childId))
+                    {
+                        DrawConnectionLine(roomNode, currentRoomNodeGraph.roomNodeDictionary[childId]);
+
+                        GUI.changed = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // draw line between parent node to child node
+    private void DrawConnectionLine(RoomNodeSO parent, RoomNodeSO child)
+    {
+        // get start and end position of line
+        Vector2 startLine = parent.rect.center;
+        Vector2 endLine = child.rect.center;
+
+        // mid point
+        Vector2 midPoint = (startLine + endLine) / 2;
+
+        // vector from start to end of line
+        Vector2 direction = endLine - startLine;
+
+        // caculate normalised perpendicular position from mid point
+        Vector2 arrowTail1 = midPoint - new Vector2(-direction.y, direction.x).normalized * arrowSize;
+        Vector2 arrowTail2 = midPoint + new Vector2(-direction.y, direction.x).normalized * arrowSize;
+
+        // caculate mid point offset for arrow head
+        Vector2 arrowHead = midPoint + direction.normalized * arrowSize;
+
+        // draw arrow
+        Handles.DrawBezier(arrowHead, arrowTail1, arrowHead, arrowTail1, Color.white, null, lineWidth);
+        Handles.DrawBezier(arrowHead, arrowTail2, arrowHead, arrowTail2, Color.white, null, lineWidth);
+
+        // draw line
+        Handles.DrawBezier(startLine, endLine, startLine, endLine, Color.white, null, lineWidth);
 
         GUI.changed = true;
     }
@@ -230,6 +300,9 @@ public class RoomNodeGraphEditor : EditorWindow
         AssetDatabase.AddObjectToAsset(roomNode, currentRoomNodeGraph);
 
         AssetDatabase.SaveAssets();
+
+        // refresh room node graph dictionary
+        currentRoomNodeGraph.OnValidate();
     }
 
     // draw all room nodes in room node list of current room node graph

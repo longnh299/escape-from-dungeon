@@ -9,10 +9,34 @@ public class RoomNodeGraphSO : ScriptableObject
     [HideInInspector] public List<RoomNodeSO> roomNodes = new List<RoomNodeSO>();
     [HideInInspector] public Dictionary<string, RoomNodeSO> roomNodeDictionary = new Dictionary<string, RoomNodeSO>();
 
+
+    public void Awake()
+    {
+        // init room node dictionary
+        LoadRoomNodeDictionary();
+    }
+
+    // load room node dictionary from room node list
+    private void LoadRoomNodeDictionary()
+    {
+        roomNodeDictionary.Clear();
+        foreach(RoomNodeSO room in roomNodes)
+        {
+            roomNodeDictionary[room.id] = room;
+        }
+
+    }
+
     #region Editor Code
 #if UNITY_EDITOR
     [HideInInspector] public RoomNodeSO roomNodeDrawLineStart = null;
     [HideInInspector] public Vector2 linePostion;
+
+    // recaculate dictionary every time has change in room node grah editor
+    public void OnValidate()
+    {
+        LoadRoomNodeDictionary();
+    }
 
     public void SetNodeToDrawConnectionLineStart(RoomNodeSO roomNode, Vector2 position)
     {
