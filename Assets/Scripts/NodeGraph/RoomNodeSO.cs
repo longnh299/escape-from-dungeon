@@ -38,12 +38,21 @@ public class RoomNodeSO : ScriptableObject
 
         EditorGUI.BeginChangeCheck();
 
-        // display popup
-        int selected = roomNodeTypes.roomNodeTypes.FindIndex(x => x == roomNodeType);
+        // if room nodes has parent or room node is entrance => it can not change type.
+        if (parentRoomNodeIds.Count > 0 || roomNodeType.isEntrance)
+        {
+            EditorGUILayout.LabelField(roomNodeType.name);
 
-        int selection = EditorGUILayout.Popup("", selected, GetRoomNodeTypesToDisplay());
+        } else
+        {
+            // display popup
+            int selected = roomNodeTypes.roomNodeTypes.FindIndex(x => x == roomNodeType);
 
-        roomNodeType = roomNodeTypes.roomNodeTypes[selection];
+            int selection = EditorGUILayout.Popup("", selected, GetRoomNodeTypesToDisplay());
+
+            roomNodeType = roomNodeTypes.roomNodeTypes[selection];
+
+        }
 
         if (EditorGUI.EndChangeCheck())
         {
