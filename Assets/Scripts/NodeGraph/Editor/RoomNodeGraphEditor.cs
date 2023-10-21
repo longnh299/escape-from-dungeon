@@ -186,7 +186,20 @@ public class RoomNodeGraphEditor : EditorWindow
     {
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("Create room node"), false, CreateRoomNode, mousePosition);
+        menu.AddSeparator("");
+        menu.AddItem(new GUIContent("Select all room nodes"), false, SelectAllRoomNodes); // add menu select all room nodes
+
         menu.ShowAsContext();
+    }
+
+    // select all room node 
+    private void SelectAllRoomNodes()
+    {
+        foreach(RoomNodeSO room in currentRoomNodeGraph.roomNodes)
+        {
+            room.isSelected = true;
+        }
+        GUI.changed = true;
     }
 
     // mouse drag event
