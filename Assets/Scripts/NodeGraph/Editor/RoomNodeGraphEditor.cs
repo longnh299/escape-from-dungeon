@@ -188,6 +188,10 @@ public class RoomNodeGraphEditor : EditorWindow
         menu.AddItem(new GUIContent("Create room node"), false, CreateRoomNode, mousePosition);
         menu.AddSeparator("");
         menu.AddItem(new GUIContent("Select all room nodes"), false, SelectAllRoomNodes); // add menu select all room nodes
+        menu.AddSeparator("");
+        menu.AddItem(new GUIContent("Delete room node connect line"), false, DeleteSelectedRoomNodeConnectLine); // option delete connect line
+        menu.AddSeparator("");
+        menu.AddItem(new GUIContent("Delete room node"), false, DeleteSelectedRoomNode); // option delete room node
 
         menu.ShowAsContext();
     }
@@ -371,6 +375,37 @@ public class RoomNodeGraphEditor : EditorWindow
             currentRoomNodeGraph = roomNodeGraph;
             GUI.changed = true;
         }
+    }
+
+    private void DeleteSelectedRoomNodeConnectLine()
+    {
+        foreach(RoomNodeSO room in currentRoomNodeGraph.roomNodes)
+        {
+            if (room.isSelected && room.childRoomNodeIds.Count > 0)
+            {
+                for(int i = room.childRoomNodeIds.Count - 1; i >= 0; i--)
+                {
+                    // get child
+                    RoomNodeSO childRoom = currentRoomNodeGraph.GetRoomNodeById(room.childRoomNodeIds[i]);
+
+                    if (childRoom != null && childRoom.isSelected)
+                    {
+                        // parent remove child id
+                        room.RemoveChildIdFromRoomNode(childRoom.id);
+                        // child remove parent id
+                        childRoom.RemoveParentIdFromRoomNode(room.id);
+                    }
+                }
+            }
+        }
+
+        // reset selected room node
+        ClearAllSelectedRoomNodes();
+    }
+
+    private void DeleteSelectedRoomNode() 
+    { 
+
     }
 
     // draw all room nodes in room node list of current room node graph

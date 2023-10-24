@@ -9,6 +9,24 @@ public class RoomNodeGraphSO : ScriptableObject
     [HideInInspector] public List<RoomNodeSO> roomNodes = new List<RoomNodeSO>();
     [HideInInspector] public Dictionary<string, RoomNodeSO> roomNodeDictionary = new Dictionary<string, RoomNodeSO>();
 
+    /* public RoomNodeSO GetRoomNodeById(string id)
+     {
+         foreach (RoomNodeSO roomNode in roomNodes)
+         {
+             if (roomNode.id == id)
+             { return roomNode; }
+         }
+         return null;
+     } */
+
+    public RoomNodeSO GetRoomNodeById(string roomNodeID)
+    {
+        if (roomNodeDictionary.TryGetValue(roomNodeID, out RoomNodeSO roomNode))
+        {
+            return roomNode;
+        }
+        return null;
+    }
 
     public void Awake()
     {

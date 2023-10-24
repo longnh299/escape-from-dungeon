@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-6619693609625062752
+--- !u!114 &-5528486447556445126
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12,19 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac37610ff70aff42b8137181eff8658, type: 3}
   m_Name: RoomNode
   m_EditorClassIdentifier: 
-  id: bd242803-ba68-4547-882d-301f06e4cbb8
-  parentRoomNodeIds:
-  - 701c0b27-d3b2-41dc-9236-0aa844f66219
+  id: 5f2011e1-020b-4015-abfe-7b68b68b5939
+  parentRoomNodeIds: []
   childRoomNodeIds: []
   roomNodeGraph: {fileID: 11400000}
-  roomNodeType: {fileID: 11400000, guid: 2c436192c98a1f24190e6dff1d50c8c5, type: 2}
+  roomNodeType: {fileID: 11400000, guid: 7b04ab28c378f9348a9c57de1040ad30, type: 2}
   roomNodeTypes: {fileID: 11400000, guid: d3e087b3af0de684f84ee14625cb8ade, type: 2}
   isLeftClickDragging: 0
   isSelected: 0
   rect:
     serializedVersion: 2
-    x: 270
-    y: 361
+    x: 324
+    y: 257
     width: 160
     height: 80
 --- !u!114 &11400000
@@ -41,12 +40,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomNodeTypes: {fileID: 0}
   roomNodes:
-  - {fileID: 1354909824635425444}
-  - {fileID: 3741581060987063078}
-  - {fileID: -6619693609625062752}
+  - {fileID: 630330554007194072}
+  - {fileID: 381990172730627567}
+  - {fileID: -5528486447556445126}
   roomNodeDrawLineStart: {fileID: 0}
   linePostion: {x: 0, y: 0}
---- !u!114 &1354909824635425444
+--- !u!114 &381990172730627567
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -58,38 +57,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ac37610ff70aff42b8137181eff8658, type: 3}
   m_Name: RoomNode
   m_EditorClassIdentifier: 
-  id: fd6e88a2-f3d4-4cf0-82f1-36a02f9ae195
-  parentRoomNodeIds: []
-  childRoomNodeIds:
-  - 701c0b27-d3b2-41dc-9236-0aa844f66219
-  roomNodeGraph: {fileID: 11400000}
-  roomNodeType: {fileID: 11400000, guid: 30d6a235650ce7b4d97bb45bcc6cb79c, type: 2}
-  roomNodeTypes: {fileID: 11400000, guid: d3e087b3af0de684f84ee14625cb8ade, type: 2}
-  isLeftClickDragging: 0
-  isSelected: 1
-  rect:
-    serializedVersion: 2
-    x: 45
-    y: 102
-    width: 160
-    height: 80
---- !u!114 &3741581060987063078
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ac37610ff70aff42b8137181eff8658, type: 3}
-  m_Name: RoomNode
-  m_EditorClassIdentifier: 
-  id: 701c0b27-d3b2-41dc-9236-0aa844f66219
+  id: eaf7d0e7-c36b-4726-9b0a-1cd72a8a0d8e
   parentRoomNodeIds:
-  - fd6e88a2-f3d4-4cf0-82f1-36a02f9ae195
-  childRoomNodeIds:
-  - bd242803-ba68-4547-882d-301f06e4cbb8
+  - 115c2891-1834-45a1-ade1-4312c52d7b51
+  childRoomNodeIds: []
   roomNodeGraph: {fileID: 11400000}
   roomNodeType: {fileID: 11400000, guid: 23525d7575430c94daf14e94d125173f, type: 2}
   roomNodeTypes: {fileID: 11400000, guid: d3e087b3af0de684f84ee14625cb8ade, type: 2}
@@ -97,7 +68,34 @@ MonoBehaviour:
   isSelected: 0
   rect:
     serializedVersion: 2
-    x: 278
-    y: 195
+    x: 304
+    y: 113
+    width: 160
+    height: 80
+--- !u!114 &630330554007194072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ac37610ff70aff42b8137181eff8658, type: 3}
+  m_Name: RoomNode
+  m_EditorClassIdentifier: 
+  id: 115c2891-1834-45a1-ade1-4312c52d7b51
+  parentRoomNodeIds: []
+  childRoomNodeIds:
+  - eaf7d0e7-c36b-4726-9b0a-1cd72a8a0d8e
+  roomNodeGraph: {fileID: 11400000}
+  roomNodeType: {fileID: 11400000, guid: 30d6a235650ce7b4d97bb45bcc6cb79c, type: 2}
+  roomNodeTypes: {fileID: 11400000, guid: d3e087b3af0de684f84ee14625cb8ade, type: 2}
+  isLeftClickDragging: 0
+  isSelected: 1
+  rect:
+    serializedVersion: 2
+    x: 69
+    y: 57
     width: 160
     height: 80
