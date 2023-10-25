@@ -377,6 +377,7 @@ public class RoomNodeGraphEditor : EditorWindow
         }
     }
 
+    // delete connect line
     private void DeleteSelectedRoomNodeConnectLine()
     {
         foreach(RoomNodeSO room in currentRoomNodeGraph.roomNodes)
@@ -403,9 +404,59 @@ public class RoomNodeGraphEditor : EditorWindow
         ClearAllSelectedRoomNodes();
     }
 
+    // delete room node
     private void DeleteSelectedRoomNode() 
     { 
+        Queue<RoomNodeSO> roomNodeDeletionQueue = new Queue<RoomNodeSO>();
 
+        // loop all room node n graph
+        foreach(RoomNodeSO roomNode in currentRoomNodeGraph.roomNodes)
+        {
+            if (roomNode.isSelected && !roomNode.roomNodeType.isEntrance) // can not remove entrance
+            {
+                roomNodeDeletionQueue.Enqueue(roomNode);
+
+                // loop all child node of this room node to delete parent id
+                foreach (string childNodeId in roomNode.childRoomNodeIds)
+                {
+                    RoomNodeSO childNode = currentRoomNodeGraph.GetRoomNodeById(childNodeId);
+
+                    if (childNode != null)
+                    {
+                        childNode.RemoveParentIdFromRoomNode(roomNode.id); // remove roomNode id from parent id list of roomNode's child
+                    }
+                }
+
+                // loop all parent node of roomNode
+                foreach(string parentId in roomNode.parentRoomNodeIds)
+                {
+                    RoomNodeSO parentNode = currentRoomNodeGraph.GetRoomNodeById(parentId);
+
+                    if (parentId != null)
+                    {
+                       parentNode.RemoveChildIdFromRoomNode(roomNode.id); // remove roomNode id from child id list of roomNode's parent
+                    }
+                }
+            }
+        }
+
+        while(roomNodeDeletionQueue.Count > 0)
+        {
+            // get room node from queue
+            RoomNodeSO deletetionNode = roomNodeDeletionQueue.Dequeue();
+
+            // remove node from dictionary
+            currentRoomNodeGraph.roomNodeDictionary.Remove(deletetionNode.id);
+
+            // remove node from list
+            currentRoomNodeGraph.roomNodes.Remove(deletetionNode);
+
+            // remove node from asset database
+            DestroyImmediate(deletetionNode, true);
+
+            // save asset database
+            AssetDatabase.SaveAssets();
+        }
     }
 
     // draw all room nodes in room node list of current room node graph
