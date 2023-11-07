@@ -34,7 +34,7 @@ public class RoomTemplateSO : ScriptableObject
 
     #region Tooltip
 
-    [Tooltip("The room node type SO. The room node types correspond to the room nodes used in the room node graph.  The exceptions being with corridors.  In the room node graph there is just one corridor type 'Corridor'.  For the room templates there are 2 corridor node types - CorridorNS and CorridorEW.")]
+    [Tooltip("The room node type SO. The room node types correspond to the room nodes used in the room node graph.  The exceptions being with corridors.  In the room node graph there is just one corridor type 'Corridor'.  For the room templates there are 2 corridor node types - VerticalCorridor and HorizontalCorridor.")]
 
     #endregion Tooltip
 
