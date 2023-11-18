@@ -8,3 +8,19 @@
     none
 }
 
+public enum GameState
+{
+    // game state
+    gameStarted,
+    playingLevel,
+    engagingEnemies,
+    bossStage,
+    engagingBoss,
+    levelCompleted,
+    gameWon,
+    gameLost,
+    gamePaused,
+    dungeonOverviewMap,
+    restartGame
+}
+
