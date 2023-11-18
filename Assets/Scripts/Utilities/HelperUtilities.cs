@@ -26,6 +26,7 @@ public static class HelperUtilities
         //Debug.Log(values);
         
 
+
         if (values == null)
         {
             Debug.Log(fieldName + " is null in object " + o.name.ToString());
