@@ -28,6 +28,15 @@ public class RoomNodeGraphSO : ScriptableObject
         return null;
     }
 
+    // get child room node
+    public IEnumerable<RoomNodeSO> GetChildRoomNodes(RoomNodeSO parentRoomNode)
+    {
+        foreach (string childNodeID in parentRoomNode.childRoomNodeIds)
+        {
+            yield return GetRoomNodeById(childNodeID);
+        }
+    }
+
     public void Awake()
     {
         // init room node dictionary
@@ -43,6 +52,19 @@ public class RoomNodeGraphSO : ScriptableObject
             roomNodeDictionary[room.id] = room;
         }
 
+    }
+
+    // get room node by room type
+    public RoomNodeSO getRoomNode(RoomNodeTypeSO roomType)
+    {
+        foreach(RoomNodeSO roomNode in roomNodes)
+        {
+            if(roomNode.roomNodeType == roomType)
+            {
+                return roomNode;
+            }
+        }
+        return null;
     }
 
     #region Editor Code
