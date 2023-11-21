@@ -34,7 +34,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     {
         HandleGameState();
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R)) // press R
         {
             gameState = GameState.gameStarted; // reset state to gameStarted
         }
