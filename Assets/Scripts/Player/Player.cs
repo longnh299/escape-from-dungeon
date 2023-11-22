@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 
 // require component => when create object, these compnent will attached into this object
 #region REQUIRE COMPONENTS
+[RequireComponent(typeof(Health))]
 [RequireComponent(typeof(SortingGroup))]
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Animator))]
