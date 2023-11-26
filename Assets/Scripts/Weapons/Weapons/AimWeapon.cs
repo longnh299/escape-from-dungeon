@@ -15,36 +15,36 @@ public class AimWeapon : MonoBehaviour
 
     private void Awake()
     {
-        // Load components
+        // load components
         aimWeaponEvent = GetComponent<AimWeaponEvent>();
     }
 
     private void OnEnable()
     {
-        // Subscribe to aim weapon event
+        // subscribe to aim weapon event
         aimWeaponEvent.OnWeaponAim += AimWeaponEvent_OnWeaponAim;
     }
 
     private void OnDisable()
     {
-        // Unsubscribe from aim weapon event
+        // unsubscribe from aim weapon event
         aimWeaponEvent.OnWeaponAim -= AimWeaponEvent_OnWeaponAim;
     }
 
 
-    // Aim weapon event handler
+    // aim weapon event handler
     private void AimWeaponEvent_OnWeaponAim(AimWeaponEvent aimWeaponEvent, AimWeaponEventArgs aimWeaponEventArgs)
     {
         Aim(aimWeaponEventArgs.aimDirection, aimWeaponEventArgs.aimAngle);
     }
 
-    // Aim the weapon
+    // aim the weapon
     private void Aim(AimDirection aimDirection, float aimAngle)
     {
-        // Set angle of the weapon transform
+        // set angle of the weapon transform
         weaponRotationPointTransform.eulerAngles = new Vector3(0f, 0f, aimAngle);
 
-        // Flip weapon transform based on player direction
+        // flip weapon transform based on player direction
         switch (aimDirection)
         {
             case AimDirection.Left:

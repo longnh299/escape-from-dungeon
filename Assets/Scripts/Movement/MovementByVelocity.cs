@@ -12,30 +12,30 @@ public class MovementByVelocity : MonoBehaviour
 
     private void Awake()
     {
-        // Load components
+        // load components
         rigidBody2D = GetComponent<Rigidbody2D>();
         movementByVelocityEvent = GetComponent<MovementByVelocityEvent>();
     }
 
     private void OnEnable()
     {
-        // Subscribe to movement event
+        // subscribe to movement event
         movementByVelocityEvent.OnMovementByVelocity += MovementByVelocityEvent_OnMovementByVelocity;
     }
 
     private void OnDisable()
     {
-        // Unsubscribe from movement event
+        // unsubscribe from movement event
         movementByVelocityEvent.OnMovementByVelocity -= MovementByVelocityEvent_OnMovementByVelocity;
     }
 
-    // On movement event
+    // on movement event
     private void MovementByVelocityEvent_OnMovementByVelocity(MovementByVelocityEvent movementByVelocityEvent, MovementByVelocityArgs movementByVelocityArgs)
     {
         MoveRigidBody(movementByVelocityArgs.moveDirection, movementByVelocityArgs.moveSpeed);
     }
 
-    // Move the rigidbody component
+    // move the rigidbody component
     private void MoveRigidBody(Vector2 moveDirection, float moveSpeed)
     {
         // ensure the rb collision detection is set to continuous

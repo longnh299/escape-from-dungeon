@@ -10,20 +10,20 @@ public class CinemachineTarget : MonoBehaviour
 
     private void Awake()
     {
-        // Load components
+        // load components
         cinemachineTargetGroup = GetComponent<CinemachineTargetGroup>();
     }
 
-    // Start is called before the first frame update
+    // start is called before the first frame update
     void Start()
     {
         SetCinemachineTargetGroup();
     }
 
-    // Set the cinemachine camera target group.
+    // set the cinemachine camera target group.
     private void SetCinemachineTargetGroup()
     {
-        // Create target group for cinemachine for the cinemachine camera to follow  - group will include the player and screen cursor
+        // create target group for cinemachine for the cinemachine camera to follow  - group will include the player and screen cursor
         CinemachineTargetGroup.Target cinemachineGroupTarget_player = new CinemachineTargetGroup.Target { weight = 1f, radius = 2.5f, target = GameManager.Instance.GetPlayer().transform };
 
         CinemachineTargetGroup.Target[] cinemachineTargetArray = new CinemachineTargetGroup.Target[] { cinemachineGroupTarget_player};

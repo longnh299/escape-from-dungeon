@@ -9,7 +9,7 @@ public class Idle : MonoBehaviour
 
     private void Awake()
     {
-        // Load components
+        // load components
         rigidBody2D = GetComponent<Rigidbody2D>();
         idleEvent = GetComponent<IdleEvent>();
 
@@ -17,13 +17,13 @@ public class Idle : MonoBehaviour
 
     private void OnEnable()
     {
-        // Subscribe to idle event
+        // subscribe to idle event
         idleEvent.OnIdle += IdleEvent_OnIdle;
     }
 
     private void OnDisable()
     {
-        // Subscribe to idle event
+        // subscribe to idle event
         idleEvent.OnIdle -= IdleEvent_OnIdle;
     }
 

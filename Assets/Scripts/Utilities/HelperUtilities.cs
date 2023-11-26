@@ -42,33 +42,33 @@ public static class HelperUtilities
     {
         AimDirection aimDirection;
 
-        // Set player direction
-        //Up Right
+        // set player direction
+        // up Right
         if (angleDegrees >= 22f && angleDegrees <= 67f)
         {
             aimDirection = AimDirection.UpRight;
         }
-        // Up
+        // up
         else if (angleDegrees > 67f && angleDegrees <= 112f)
         {
             aimDirection = AimDirection.Up;
         }
-        // Up Left
+        // up Left
         else if (angleDegrees > 112f && angleDegrees <= 158f)
         {
             aimDirection = AimDirection.UpLeft;
         }
-        // Left
+        // left
         else if ((angleDegrees <= 180f && angleDegrees > 158f) || (angleDegrees > -180 && angleDegrees <= -135f))
         {
             aimDirection = AimDirection.Left;
         }
-        // Down
+        // down
         else if ((angleDegrees > -135f && angleDegrees <= -45f))
         {
             aimDirection = AimDirection.Down;
         }
-        // Right
+        // right
         else if ((angleDegrees > -45f && angleDegrees <= 0f) || (angleDegrees > 0 && angleDegrees < 22f))
         {
             aimDirection = AimDirection.Right;
@@ -214,7 +214,7 @@ public static class HelperUtilities
         return error;
     }
 
-    // Get the nearest spawn position to the player
+    // get the nearest spawn position to the player
     public static Vector3 GetSpawnPositionNearestToPlayer(Vector3 playerPosition)
     {
         Room currentRoom = GameManager.Instance.GetCurrentRoom();
@@ -223,7 +223,7 @@ public static class HelperUtilities
 
         Vector3 nearestSpawnPosition = new Vector3(10000f, 10000f, 0f);
 
-        // Loop through room spawn positions
+        // loop through room spawn positions
         foreach (Vector2Int spawnPositionGrid in currentRoom.spawnPositionArray)
         {
             // convert the spawn grid positions to world positions

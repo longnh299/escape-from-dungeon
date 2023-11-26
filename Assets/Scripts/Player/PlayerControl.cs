@@ -56,7 +56,7 @@ public class PlayerControl : MonoBehaviour
             direction *= 0.7f;
         }
 
-        // If there is movement either move or roll
+        // if there is movement either move or roll
         if (direction != Vector2.zero)
         {
             // trigger movement event
@@ -76,31 +76,31 @@ public class PlayerControl : MonoBehaviour
         float weaponAngleDegrees, playerAngleDegrees;
         AimDirection playerAimDirection;
 
-        // Aim weapon input
+        // aim weapon input
         AimWeaponInput(out weaponDirection, out weaponAngleDegrees, out playerAngleDegrees, out playerAimDirection);
     }
 
     private void AimWeaponInput(out Vector3 weaponDirection, out float weaponAngleDegrees, out float playerAngleDegrees, out AimDirection playerAimDirection)
     {
-        // Get mouse world position
+        // get mouse world position
         Vector3 mouseWorldPosition = HelperUtilities.GetMouseWorldPosition();
 
-        // Calculate direction vector of mouse cursor from weapon shoot position
+        // calculate direction vector of mouse cursor from weapon shoot position
         weaponDirection = (mouseWorldPosition - weaponShootPostion.position);
 
-        // Calculate direction vector of mouse cursor from player transform position
+        // calculate direction vector of mouse cursor from player transform position
         Vector3 playerDirection = (mouseWorldPosition - transform.position);
 
-        // Get weapon to cursor angle
+        // get weapon to cursor angle
         weaponAngleDegrees = HelperUtilities.GetAngleFromVector(weaponDirection);
 
-        // Get player to cursor angle
+        // get player to cursor angle
         playerAngleDegrees = HelperUtilities.GetAngleFromVector(playerDirection);
 
-        // Set player aim direction
+        // set player aim direction
         playerAimDirection = HelperUtilities.GetAimDirection(playerAngleDegrees);
 
-        // Trigger weapon aim event
+        // trigger weapon aim event
         player.aimWeaponEvent.CallAimWeaponEvent(playerAimDirection, playerAngleDegrees, weaponAngleDegrees, weaponDirection); // call to event
     }
 

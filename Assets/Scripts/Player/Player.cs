@@ -46,12 +46,12 @@ public class Player : MonoBehaviour
     }
 
  
-    // Initialize the player
+    // initialize the player
     public void Initialize(PlayerDetailsSO playerDetails)
     {
         this.playerDetails = playerDetails;
 
-        // Set player starting health
+        // set player starting health
         SetPlayerHealth();
     }
 
