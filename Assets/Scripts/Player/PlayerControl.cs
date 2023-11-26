@@ -6,17 +6,28 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class PlayerControl : MonoBehaviour
 {
+
+    #region Tooltip
+    [Tooltip("MovementDetailsSO scriptable object containing movement details such as speed")]
+    #endregion Tooltip
+
+    [SerializeField] private MovementDetailsSO movementDetails;
+
     #region Tooltip
     [Tooltip("The player WeaponShootPosition gameobject")]
     #endregion Tooltip
     [SerializeField] private Transform weaponShootPostion;
 
     private Player player;
+    private float moveSpeed;
 
     private void Awake()
     {
-        // Load components
+        // load components
         player = GetComponent<Player>();
+
+        // load move speed
+        moveSpeed = movementDetails.GetMoveSpeed();
     }
 
     private void Update()
@@ -32,10 +43,33 @@ public class PlayerControl : MonoBehaviour
     // player movement input
     private void MovementInput()
     {
-        player.idleEvent.CallIdleEvent();
+        // get movement input
+        float horizontalMovement = Input.GetAxisRaw("Horizontal");
+        float verticalMovement = Input.GetAxisRaw("Vertical");
+
+        // create a direction vector based on the input
+        Vector2 direction = new Vector2(horizontalMovement, verticalMovement);
+
+        // adjust distance for diagonal movement (pythagoras approximation)
+        if (horizontalMovement != 0f && verticalMovement != 0f)
+        {
+            direction *= 0.7f;
+        }
+
+        // If there is movement either move or roll
+        if (direction != Vector2.zero)
+        {
+            // trigger movement event
+            player.movementByVelocityEvent.CallMovementByVelocityEvent(direction, moveSpeed);
+        }
+        else
+        {
+            // trigger idle event
+            player.idleEvent.CallIdleEvent();
+        }
     }
 
-    // Weapon Input
+    // weapon Input
     private void WeaponInput()
     {
         Vector3 weaponDirection;
@@ -69,6 +103,15 @@ public class PlayerControl : MonoBehaviour
         // Trigger weapon aim event
         player.aimWeaponEvent.CallAimWeaponEvent(playerAimDirection, playerAngleDegrees, weaponAngleDegrees, weaponDirection); // call to event
     }
+
+    #region Validation
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        HelperUtilities.ValidateCheckNullValue(this, nameof(movementDetails), movementDetails);
+    }
+#endif
+    #endregion Validation
 
 
 }
