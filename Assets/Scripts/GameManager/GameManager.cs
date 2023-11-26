@@ -113,6 +113,12 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         currentRoom = room;
     }
 
+    // get player
+    public Player GetPlayer()
+    {
+        return player;
+    }
+
     #region Validation
 
 #if UNITY_EDITOR
