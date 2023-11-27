@@ -16,7 +16,8 @@ public static class Settings
     #endregion
 
     #region ROOM SETTINGS
-    public static int maxChildCorridors = 4; // max child corridor 
+    public const float fadeInTime = 0.5f; // time to fade in the room
+    public static int maxChildCorridors = 3; // max child corridor 
     #endregion 
 
     #region ANIMATOR PARAMETERS
