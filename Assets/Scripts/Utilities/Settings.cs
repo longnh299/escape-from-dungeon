@@ -19,6 +19,7 @@ public static class Settings
     public static int maxChildCorridors = 4; // max child corridor 
     #endregion 
 
+    #region ANIMATOR PARAMETERS
     // player animator parameter (convert to int because compare int is faster than compare string)
     public static int aimUp = Animator.StringToHash("aimUp");
     public static int aimDown = Animator.StringToHash("aimDown");
@@ -32,4 +33,14 @@ public static class Settings
     public static int rollLeft = Animator.StringToHash("rollLeft");
     public static int rollRight = Animator.StringToHash("rollRight");
     public static int rollDown = Animator.StringToHash("rollDown");
+
+    // Animator parameters - Door
+    public static int open = Animator.StringToHash("open");
+
+    #endregion
+
+    #region GAMEOBJECT TAGS
+    public const string playerTag = "Player";
+    public const string playerWeapon = "playerWeapon";
+    #endregion
 }
