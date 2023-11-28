@@ -176,6 +176,9 @@ public class PlayerControl : MonoBehaviour
 
         // Fire weapon input
         FireWeaponInput(weaponDirection, weaponAngleDegrees, playerAngleDegrees, playerAimDirection);
+
+        // Reload weapon input
+        ReloadWeaponInput();
     }
 
     private void AimWeaponInput(out Vector3 weaponDirection, out float weaponAngleDegrees, out float playerAngleDegrees, out AimDirection playerAimDirection)
@@ -219,6 +222,28 @@ public class PlayerControl : MonoBehaviour
             currentWeaponIndex = weaponIndex;
             player.setActiveWeaponEvent.CallSetActiveWeaponEvent(player.weaponList[weaponIndex - 1]);
         }
+    }
+
+    // reload weapon
+    private void ReloadWeaponInput()
+    {
+        Weapon currentWeapon = player.activeWeapon.GetCurrentWeapon();
+
+        // if current weapon is reloading return
+        if (currentWeapon.isWeaponReloading) return;
+
+        // remaining ammo is less than clip capacity then return and not infinite ammo then return
+        if (currentWeapon.weaponRemainingAmmo < currentWeapon.weaponDetails.weaponClipAmmoCapacity && !currentWeapon.weaponDetails.hasInfiniteAmmo) return;
+
+        // if ammo in clip equals clip capacity then return
+        if (currentWeapon.weaponClipRemainingAmmo == currentWeapon.weaponDetails.weaponClipAmmoCapacity) return;
+
+        if (Input.GetKeyDown(KeyCode.R)) // press R to reload weapon
+        {
+            // Call the reload weapon event
+            player.reloadWeaponEvent.CallReloadWeaponEvent(player.activeWeapon.GetCurrentWeapon(), 0);
+        }
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

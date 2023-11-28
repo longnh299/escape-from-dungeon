@@ -428,6 +428,9 @@ GameObject:
   - component: {fileID: 8640598381506811683}
   - component: {fileID: 6614900904035074902}
   - component: {fileID: 236356301664742405}
+  - component: {fileID: -8348283064272354921}
+  - component: {fileID: -5856288859102613970}
+  - component: {fileID: -8724336545880408394}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -701,6 +704,8 @@ MonoBehaviour:
   setActiveWeaponEvent: {fileID: 0}
   activeWeapon: {fileID: 0}
   weaponFiredEvent: {fileID: 0}
+  reloadWeaponEvent: {fileID: 0}
+  weaponReloadedEvent: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!114 &2980555157275802356
@@ -887,6 +892,42 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8ddaef00d5c9a2b448807ad3b072e1bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-8348283064272354921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257458718187140361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d120cfe4838ec24696ca49b099ad672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-5856288859102613970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257458718187140361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11b7c7d141c8e8c4bb5bc0cca3e63267, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-8724336545880408394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8257458718187140361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d452461c63091f4fbe03d19c4e3ddf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8839312051351733040
