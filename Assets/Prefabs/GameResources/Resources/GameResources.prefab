@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomNodeTypeList: {fileID: 11400000, guid: d3e087b3af0de684f84ee14625cb8ade, type: 2}
   currentPlayer: {fileID: 11400000, guid: 0f8c28ec88caf314eb806e4cc8394ef0, type: 2}
+  soundsMasterMixerGroup: {fileID: -4734643798044506327, guid: 2ac509b551addfb48950fbdc0d9cefb4, type: 2}
   dimmedMaterial: {fileID: 2100000, guid: fd5ae752e16da36428c7ae98c49dc19e, type: 2}
   litMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   variableLitShader: {fileID: -6465566751694194690, guid: 03604eb4be4b60c4d8ad503c37de8750, type: 3}
