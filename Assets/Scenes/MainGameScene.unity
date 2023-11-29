@@ -202,6 +202,9 @@ MonoBehaviour:
   - poolSize: 10
     prefab: {fileID: 1364533380425104292, guid: c821b54965730ed41bc7d6844f59e73b, type: 3}
     componentType: IFireable
+  - poolSize: 40
+    prefab: {fileID: 1343637187509724247, guid: b78b2f3524d34484387a0a61e618632a, type: 3}
+    componentType: SoundEffect
 --- !u!4 &210768046
 Transform:
   m_ObjectHideFlags: 0
@@ -767,9 +770,9 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.05347092
+    x: 0
     y: 0
-    width: 0.8922243
+    width: 1
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
