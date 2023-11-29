@@ -199,6 +199,9 @@ MonoBehaviour:
   - poolSize: 30
     prefab: {fileID: 1364533380425104292, guid: 163ad0a63142e054f97bfac3febd3d4f, type: 3}
     componentType: IFireable
+  - poolSize: 10
+    prefab: {fileID: 1364533380425104292, guid: c821b54965730ed41bc7d6844f59e73b, type: 3}
+    componentType: IFireable
 --- !u!4 &210768046
 Transform:
   m_ObjectHideFlags: 0
@@ -764,9 +767,9 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.058656573
+    x: 0.05347092
     y: 0
-    width: 0.88300216
+    width: 0.8922243
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
