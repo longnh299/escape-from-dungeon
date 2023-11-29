@@ -179,6 +179,41 @@ public class FireWeapon : MonoBehaviour
         // Call weapon fired event
         weaponFiredEvent.CallWeaponFiredEvent(activeWeapon.GetCurrentWeapon());
 
+        // Display weapon shoot effect
+       // WeaponShootEffect(aimAngle);
+
+        // Weapon fired sound effect
+        WeaponSoundEffect();
+
+    }
+
+    /*
+    // Display the weapon shoot effect
+    private void WeaponShootEffect(float aimAngle)
+    {
+        // Process if there is a shoot effect & prefab
+        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect != null && activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab != null)
+        {
+            // Get weapon shoot effect gameobject from the pool with particle system component
+            WeaponShootEffect weaponShootEffect = (WeaponShootEffect)PoolManager.Instance.ReuseComponent(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab, activeWeapon.GetShootEffectPosition(), Quaternion.identity);
+
+            // Set shoot effect
+            weaponShootEffect.SetShootEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect, aimAngle);
+
+            // Set gameobject active (the particle system is set to automatically disable the
+            // gameobject once finished)
+            weaponShootEffect.gameObject.SetActive(true);
+        }
+    }
+    */
+
+    // Play weapon shooting sound effect
+    private void WeaponSoundEffect()
+    {
+        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponFiringSoundEffect != null)
+        {
+            SoundEffectManager.Instance.PlaySoundEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponFiringSoundEffect);
+        }
     }
 
     // Reset cooldown timer
