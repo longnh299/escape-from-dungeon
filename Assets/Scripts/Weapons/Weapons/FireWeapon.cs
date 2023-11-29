@@ -116,17 +116,47 @@ public class FireWeapon : MonoBehaviour
         return true;
     }
 
-    /// Set up ammo using an ammo gameobject and component from the object pool.
+    // Set up ammo using an ammo gameobject and component from the object pool.
     private void FireAmmo(float aimAngle, float weaponAimAngle, Vector3 weaponAimDirectionVector)
     {
         AmmoDetailsSO currentAmmo = activeWeapon.GetCurrentAmmo();
 
         if (currentAmmo != null)
         {
-            // get ammo gameObject prefab from array
+            // Fire ammo routine.
+            StartCoroutine(FireAmmoRoutine(currentAmmo, aimAngle, weaponAimAngle, weaponAimDirectionVector));
+        }
+    }
+
+    // Coroutine to spawn multiple ammo per shot if specified in the ammo details
+    private IEnumerator FireAmmoRoutine(AmmoDetailsSO currentAmmo, float aimAngle, float weaponAimAngle, Vector3 weaponAimDirectionVector)
+    {
+        int ammoCounter = 0;
+
+        // Get random ammo per shot
+        int ammoPerShot = Random.Range(currentAmmo.ammoSpawnAmountMin, currentAmmo.ammoSpawnAmountMax + 1);
+
+        // Get random interval between ammo
+        float ammoSpawnInterval;
+
+        if (ammoPerShot > 1)
+        {
+            ammoSpawnInterval = Random.Range(currentAmmo.ammoSpawnIntervalMin, currentAmmo.ammoSpawnIntervalMax);
+        }
+        else
+        {
+            ammoSpawnInterval = 0f;
+        }
+
+        // Loop for number of ammo per shot
+        while (ammoCounter < ammoPerShot)
+        {
+            ammoCounter++;
+
+            // Get ammo prefab from array
             GameObject ammoPrefab = currentAmmo.ammoPrefabArray[Random.Range(0, currentAmmo.ammoPrefabArray.Length)];
 
-            // get random speed value
+            // Get random speed value
             float ammoSpeed = Random.Range(currentAmmo.ammoSpeedMin, currentAmmo.ammoSpeedMax);
 
             // Get Gameobject with IFireable component
@@ -135,16 +165,20 @@ public class FireWeapon : MonoBehaviour
             // Initialise Ammo
             ammo.InitialiseAmmo(currentAmmo, aimAngle, weaponAimAngle, ammoSpeed, weaponAimDirectionVector);
 
-            // Reduce ammo clip count if not infinite clip capacity
-            if (!activeWeapon.GetCurrentWeapon().weaponDetails.hasInfiniteClipCapacity)
-            {
-                activeWeapon.GetCurrentWeapon().weaponClipRemainingAmmo--;
-                activeWeapon.GetCurrentWeapon().weaponRemainingAmmo--;
-            }
-
-            // Call weapon fired event
-            weaponFiredEvent.CallWeaponFiredEvent(activeWeapon.GetCurrentWeapon());
+            // Wait for ammo per shot timegap
+            yield return new WaitForSeconds(ammoSpawnInterval);
         }
+
+        // Reduce ammo clip count if not infinite clip capacity
+        if (!activeWeapon.GetCurrentWeapon().weaponDetails.hasInfiniteClipCapacity)
+        {
+            activeWeapon.GetCurrentWeapon().weaponClipRemainingAmmo--;
+            activeWeapon.GetCurrentWeapon().weaponRemainingAmmo--;
+        }
+
+        // Call weapon fired event
+        weaponFiredEvent.CallWeaponFiredEvent(activeWeapon.GetCurrentWeapon());
+
     }
 
     // Reset cooldown timer
