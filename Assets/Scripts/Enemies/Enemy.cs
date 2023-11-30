@@ -19,11 +19,13 @@ public class Enemy : MonoBehaviour
     private CircleCollider2D circleCollider2D;
     private PolygonCollider2D polygonCollider2D;
     [HideInInspector] public SpriteRenderer[] spriteRendererArray;
+    [HideInInspector] public Animator animator;
 
     private void Awake()
     {
         circleCollider2D = GetComponent<CircleCollider2D>();
         polygonCollider2D = GetComponent<PolygonCollider2D>();
         spriteRendererArray = GetComponentsInChildren<SpriteRenderer>();
+        animator = GetComponent<Animator>();
     }
 }

@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1067249243931309092, guid: 2955af7a8b0fa9e4ba33a88c54209c70, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 0f372b3c644e5ce4a9d95f7f7f25d99a, type: 2}
     - target: {fileID: 4323887984390635883, guid: 2955af7a8b0fa9e4ba33a88c54209c70, type: 3}
       propertyPath: m_Name
       value: MudRock_Brown
