@@ -47,6 +47,7 @@ public class Door : MonoBehaviour
         animator.SetBool(Settings.open, isOpen);
     }
 
+
     // Open the door
     public void OpenDoor()
     {
@@ -62,6 +63,7 @@ public class Door : MonoBehaviour
 
             // play sound effect
             SoundEffectManager.Instance.PlaySoundEffect(GameResources.Instance.doorOpenCloseSoundEffect);
+
         }
     }
 
@@ -97,4 +99,5 @@ public class Door : MonoBehaviour
     }
 #endif
     #endregion
+
 }

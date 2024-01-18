@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 [RequireComponent(typeof(Player))]
 [DisallowMultipleComponent]
-public class PlayerControl : MonoBehaviour
-{
 
+public class PlayerControl : NetworkBehaviour
+{
     #region Tooltip
+
     [Tooltip("MovementDetailsSO scriptable object containing movement details such as speed")]
+
     #endregion Tooltip
 
     [SerializeField] private MovementDetailsSO movementDetails;
-
 
     private Player player;
     private bool leftMouseDownPreviousFrame = false;
@@ -20,10 +22,20 @@ public class PlayerControl : MonoBehaviour
     private float moveSpeed;
     private Coroutine playerRollCoroutine;
     private WaitForFixedUpdate waitForFixedUpdate;
-    private bool isPlayerRolling = false;
     private float playerRollCooldownTimer = 0f;
-    // private bool isPlayerMovementDisabled = false;
+    private bool isPlayerMovementDisabled = false;
 
+    [HideInInspector] public bool isPlayerRolling = false;
+
+    private void Awake()
+    {
+        // Load components
+        player = GetComponent<Player>();
+
+        moveSpeed = movementDetails.GetMoveSpeed();
+    }
+
+    [ClientCallback]
     private void Start()
     {
         // Create waitforfixed update for use in coroutine
@@ -60,49 +72,49 @@ public class PlayerControl : MonoBehaviour
         player.animator.speed = moveSpeed / Settings.baseSpeedForPlayerAnimations;
     }
 
-    private void Awake()
-    {
-        // load components
-        player = GetComponent<Player>();
-
-        // load move speed
-        moveSpeed = movementDetails.GetMoveSpeed();
-    }
-
+    [ClientCallback]
     private void Update()
     {
+        if(!isOwned) return;
+
+        // if player movement disabled then return
+        if (isPlayerMovementDisabled)
+            return;
+
         // if player is rolling then return
         if (isPlayerRolling) return;
 
-        // process the player movement input
+        // Process the player movement input
         MovementInput();
 
-        // process the player weapon input
+        // Process the player weapon input
         WeaponInput();
+
+        // Process player use item input
+        UseItemInput();
 
         // Player roll cooldown timer
         PlayerRollCooldownTimer();
-
     }
 
-    // player movement input
+    // Player movement input
     private void MovementInput()
     {
-        // get movement input
+        // Get movement input
         float horizontalMovement = Input.GetAxisRaw("Horizontal");
         float verticalMovement = Input.GetAxisRaw("Vertical");
         bool rightMouseButtonDown = Input.GetMouseButtonDown(1);
 
-        // create a direction vector based on the input
+        // Create a direction vector based on the input
         Vector2 direction = new Vector2(horizontalMovement, verticalMovement);
 
-        // adjust distance for diagonal movement (pythagoras approximation)
+        // Adjust distance for diagonal movement (pythagoras approximation)
         if (horizontalMovement != 0f && verticalMovement != 0f)
         {
             direction *= 0.7f;
         }
 
-        // if there is movement either move or roll
+        // If there is movement either move or roll
         if (direction != Vector2.zero)
         {
             if (!rightMouseButtonDown)
@@ -115,10 +127,11 @@ public class PlayerControl : MonoBehaviour
             {
                 PlayerRoll((Vector3)direction);
             }
+
         }
+        // else trigger idle event
         else
         {
-            // trigger idle event
             player.idleEvent.CallIdleEvent();
         }
     }
@@ -165,20 +178,20 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    // weapon Input
+    // Weapon Input
     private void WeaponInput()
     {
         Vector3 weaponDirection;
         float weaponAngleDegrees, playerAngleDegrees;
         AimDirection playerAimDirection;
 
-        // aim weapon input
+        // Aim weapon input
         AimWeaponInput(out weaponDirection, out weaponAngleDegrees, out playerAngleDegrees, out playerAimDirection);
 
         // Fire weapon input
         FireWeaponInput(weaponDirection, weaponAngleDegrees, playerAngleDegrees, playerAimDirection);
 
-        // Switch weapon input in list weapon
+        // Switch weapon input
         SwitchWeaponInput();
 
         // Reload weapon input
@@ -187,28 +200,27 @@ public class PlayerControl : MonoBehaviour
 
     private void AimWeaponInput(out Vector3 weaponDirection, out float weaponAngleDegrees, out float playerAngleDegrees, out AimDirection playerAimDirection)
     {
-        // get mouse world position
+        // Get mouse world position
         Vector3 mouseWorldPosition = HelperUtilities.GetMouseWorldPosition();
 
-        // calculate direction vector of mouse cursor from weapon shoot position
+        // Calculate direction vector of mouse cursor from weapon shoot position
         weaponDirection = (mouseWorldPosition - player.activeWeapon.GetShootPosition());
 
-        // calculate direction vector of mouse cursor from player transform position
+        // Calculate direction vector of mouse cursor from player transform position
         Vector3 playerDirection = (mouseWorldPosition - transform.position);
 
-        // get weapon to cursor angle
+        // Get weapon to cursor angle
         weaponAngleDegrees = HelperUtilities.GetAngleFromVector(weaponDirection);
 
-        // get player to cursor angle
+        // Get player to cursor angle
         playerAngleDegrees = HelperUtilities.GetAngleFromVector(playerDirection);
 
-        // set player aim direction
+        // Set player aim direction
         playerAimDirection = HelperUtilities.GetAimDirection(playerAngleDegrees);
 
-        // trigger weapon aim event
-        player.aimWeaponEvent.CallAimWeaponEvent(playerAimDirection, playerAngleDegrees, weaponAngleDegrees, weaponDirection); // call to event
+        // Trigger weapon aim event
+        player.aimWeaponEvent.CallAimWeaponEvent(playerAimDirection, playerAngleDegrees, weaponAngleDegrees, weaponDirection);
     }
-
 
     private void FireWeaponInput(Vector3 weaponDirection, float weaponAngleDegrees, float playerAngleDegrees, AimDirection playerAimDirection)
     {
@@ -233,7 +245,7 @@ public class PlayerControl : MonoBehaviour
             PreviousWeapon();
         }
 
-        if (Input.mouseScrollDelta.y > 0f)
+        if (Input.mouseScrollDelta.y > 0f) 
         {
             NextWeapon();
         }
@@ -308,7 +320,7 @@ public class PlayerControl : MonoBehaviour
     {
         currentWeaponIndex++;
 
-        if (currentWeaponIndex > player.weaponList.Count) // if weapon index is max => reset index to 1
+        if (currentWeaponIndex > player.weaponList.Count)
         {
             currentWeaponIndex = 1;
         }
@@ -329,7 +341,7 @@ public class PlayerControl : MonoBehaviour
         SetWeaponByIndex(currentWeaponIndex);
     }
 
-    // reload weapon
+
     private void ReloadWeaponInput()
     {
         Weapon currentWeapon = player.activeWeapon.GetCurrentWeapon();
@@ -343,12 +355,35 @@ public class PlayerControl : MonoBehaviour
         // if ammo in clip equals clip capacity then return
         if (currentWeapon.weaponClipRemainingAmmo == currentWeapon.weaponDetails.weaponClipAmmoCapacity) return;
 
-        if (Input.GetKeyDown(KeyCode.R)) // press R to reload weapon
+        if (Input.GetKeyDown(KeyCode.R))
         {
             // Call the reload weapon event
             player.reloadWeaponEvent.CallReloadWeaponEvent(player.activeWeapon.GetCurrentWeapon(), 0);
         }
 
+    }
+
+    // Use the nearest item within 2 unity units from the player
+    private void UseItemInput()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            float useItemRadius = 2f;
+
+            // Get any 'Useable' item near the player
+            Collider2D[] collider2DArray = Physics2D.OverlapCircleAll(player.GetPlayerPosition(), useItemRadius);
+
+            // Loop through detected items to see if any are 'useable'
+            foreach (Collider2D collider2D in collider2DArray)
+            {
+                IUseable iUseable = collider2D.GetComponent<IUseable>();
+
+                if (iUseable != null)
+                {
+                    iUseable.UseItem();
+                }
+            }
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -371,6 +406,19 @@ public class PlayerControl : MonoBehaviour
 
             isPlayerRolling = false;
         }
+    }
+
+    // Enable the player movement
+    public void EnablePlayer()
+    {
+        isPlayerMovementDisabled = false;
+    }
+
+    // Disable the player movement
+    public void DisablePlayer()
+    {
+        isPlayerMovementDisabled = true;
+        player.idleEvent.CallIdleEvent();
     }
 
     // Set the current weapon to be first in the player weapon list
@@ -406,13 +454,15 @@ public class PlayerControl : MonoBehaviour
     }
 
     #region Validation
+
 #if UNITY_EDITOR
+
     private void OnValidate()
     {
         HelperUtilities.ValidateCheckNullValue(this, nameof(movementDetails), movementDetails);
     }
+
 #endif
+
     #endregion Validation
-
-
 }

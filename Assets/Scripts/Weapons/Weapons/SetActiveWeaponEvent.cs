@@ -14,6 +14,7 @@ public class SetActiveWeaponEvent : MonoBehaviour
     }
 }
 
+
 public class SetActiveWeaponEventArgs : EventArgs
 {
     public Weapon weapon;

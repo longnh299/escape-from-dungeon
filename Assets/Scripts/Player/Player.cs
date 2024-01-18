@@ -1,17 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
+using Mirror;
+using System.Linq;
 
 
-// require component => when create object, these compnent will attached into this object
 #region REQUIRE COMPONENTS
+[RequireComponent(typeof(HealthEvent))]
 [RequireComponent(typeof(Health))]
+[RequireComponent(typeof(DealContactDamage))]
+[RequireComponent(typeof(ReceiveContactDamage))]
+[RequireComponent(typeof(DestroyedEvent))]
+[RequireComponent(typeof(Destroyed))]
 [RequireComponent(typeof(PlayerControl))]
-[RequireComponent (typeof(MovementByVelocity))]
 [RequireComponent(typeof(MovementByVelocityEvent))]
-[RequireComponent(typeof(MovementToPosition))]
+[RequireComponent(typeof(MovementByVelocity))]
 [RequireComponent(typeof(MovementToPositionEvent))]
+[RequireComponent(typeof(MovementToPosition))]
 [RequireComponent(typeof(IdleEvent))]
 [RequireComponent(typeof(Idle))]
 [RequireComponent(typeof(AimWeaponEvent))]
@@ -34,12 +41,17 @@ using UnityEngine.Rendering;
 [DisallowMultipleComponent]
 #endregion REQUIRE COMPONENTS
 
-public class Player : MonoBehaviour
+
+
+public class Player : NetworkBehaviour
 {
     [HideInInspector] public PlayerDetailsSO playerDetails;
+    [HideInInspector] public HealthEvent healthEvent;
     [HideInInspector] public Health health;
-    [HideInInspector] public MovementToPositionEvent movementToPositionEvent;
+    [HideInInspector] public DestroyedEvent destroyedEvent;
+    [HideInInspector] public PlayerControl playerControl;
     [HideInInspector] public MovementByVelocityEvent movementByVelocityEvent;
+    [HideInInspector] public MovementToPositionEvent movementToPositionEvent;
     [HideInInspector] public IdleEvent idleEvent;
     [HideInInspector] public AimWeaponEvent aimWeaponEvent;
     [HideInInspector] public FireWeaponEvent fireWeaponEvent;
@@ -53,11 +65,17 @@ public class Player : MonoBehaviour
 
     public List<Weapon> weaponList = new List<Weapon>();
 
+    public AllWeaponSO allWeapon;
+    [SyncVar(hook = nameof(SyncWeapon))] public int weapon_index = 0;
+    [SyncVar] public int chr_index = 0;
 
     private void Awake()
     {
-        // load components of player object
+        // Load components
+        healthEvent = GetComponent<HealthEvent>();
         health = GetComponent<Health>();
+        destroyedEvent = GetComponent<DestroyedEvent>();
+        playerControl = GetComponent<PlayerControl>();
         movementByVelocityEvent = GetComponent<MovementByVelocityEvent>();
         movementToPositionEvent = GetComponent<MovementToPositionEvent>();
         idleEvent = GetComponent<IdleEvent>();
@@ -70,11 +88,132 @@ public class Player : MonoBehaviour
         weaponReloadedEvent = GetComponent<WeaponReloadedEvent>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-
     }
 
- 
-    // initialize the player
+    //Fix
+    public override void OnStartAuthority()
+    {
+        C_Data.Instance.character = this;
+
+        Initialize(GameResources.Instance.currentPlayer.playerDetails);
+
+        setActiveWeaponEvent.OnSetActiveWeapon += SetWeaponEvent_OnSetActiveWeapon;
+
+        SceneManager.LoadScene("MainGameScene");
+    }
+
+    public override void OnStartClient()
+    {
+        FindObjectOfType<Minimap>()?.AddPlayer(this);
+    }
+
+    public void OpenDoor(string id)
+    {
+        if (isOwned) Cmd_OpenDoor(id);
+    }
+
+    [Command]
+    void Cmd_OpenDoor(string id)
+    {
+        Rpc_OpenDoor(id);
+    }
+
+    [ClientRpc]
+    void Rpc_OpenDoor(string id)
+    {
+        try
+        {
+            EnemySpawner.Instance.OpenDoor(FindObjectsOfType<InstantiatedRoom>().FirstOrDefault(n => n.room.id == id).room);
+        }
+        catch
+        {
+        }
+    }
+
+    //Fix
+    public void SyncWeapon(int _, int n)
+    {
+        if (isOwned) return;
+
+        WeaponDetailsSO weaponDetails = allWeapon.weapons[n];
+
+        Weapon weapon = new Weapon() { weaponDetails = weaponDetails, weaponReloadTimer = 0f, weaponClipRemainingAmmo = weaponDetails.weaponClipAmmoCapacity, weaponRemainingAmmo = weaponDetails.weaponAmmoCapacity, isWeaponReloading = false };
+
+        setActiveWeaponEvent.CallSetActiveWeaponEvent(weapon);
+    }
+
+    //Fix
+    private void SetWeaponEvent_OnSetActiveWeapon(SetActiveWeaponEvent setActiveWeaponEvent, SetActiveWeaponEventArgs setActiveWeaponEventArgs)
+    {
+        int a = 0;
+        foreach (var i in allWeapon.weapons)
+        {
+            if (i == setActiveWeaponEventArgs.weapon.weaponDetails)
+            {
+                break;
+            }
+
+            a++;
+        }
+
+        weapon_index = a;
+    }
+
+    public void FireWeaponEvent_OnFireWeapon(FireWeaponEventArgs fireWeaponEventArgs)
+    {
+        Cmd_Fire(fireWeaponEventArgs);
+    }
+
+    [Command]
+    void Cmd_Fire(FireWeaponEventArgs fireWeaponEventArgs)
+    {
+        Rpc_Fire(fireWeaponEventArgs);
+    }
+
+    [ClientRpc]
+    void Rpc_Fire(FireWeaponEventArgs fireWeaponEventArgs)
+    {
+        if (isOwned) return;
+
+        fireWeaponEvent.CallFireWeaponEvent(
+                true,
+                fireWeaponEventArgs.firePreviousFrame,
+                fireWeaponEventArgs.aimDirection,
+                fireWeaponEventArgs.aimAngle,
+                fireWeaponEventArgs.weaponAimAngle,
+                fireWeaponEventArgs.weaponAimDirectionVector);
+
+        aimWeaponEvent.CallAimWeaponEvent(
+                fireWeaponEventArgs.aimDirection,
+                fireWeaponEventArgs.aimAngle,
+                fireWeaponEventArgs.weaponAimAngle,
+                fireWeaponEventArgs.weaponAimDirectionVector);
+    }
+
+    // fix long
+    public void AimWeaponEvent_OnWeaponAim(AimWeaponEventArgs aimWeaponEventArgs)
+    {
+        Cmd_Aim(aimWeaponEventArgs);
+    }
+
+    [Command]
+    void Cmd_Aim(AimWeaponEventArgs aimWeaponEventArgs)
+    {
+        Rpc_Aim(aimWeaponEventArgs);
+    }
+
+    [ClientRpc]
+    void Rpc_Aim(AimWeaponEventArgs aimWeaponEventArgs)
+    {
+        if (isOwned) return;
+
+        aimWeaponEvent.CallAimWeaponEvent(aimWeaponEventArgs.aimDirection, aimWeaponEventArgs.aimAngle, aimWeaponEventArgs.weaponAimAngle, aimWeaponEventArgs.weaponAimDirectionVector);
+    }
+
+
+
+
+    // Initialize the player
     public void Initialize(PlayerDetailsSO playerDetails)
     {
         this.playerDetails = playerDetails;
@@ -82,9 +221,48 @@ public class Player : MonoBehaviour
         //Create player starting weapons
         CreatePlayerStartingWeapons();
 
-        // set player starting health
+        // Set player starting health
         SetPlayerHealth();
     }
+
+    ///Fix
+    public void Sv_Initialize(PlayerDetailsSO playerDetails)
+    {
+        this.playerDetails = playerDetails;
+
+        //Create player starting weapons
+        CreatePlayerStartingWeapons();
+    }
+
+    private void OnEnable()
+    {
+        // Subscribe to player health event
+        healthEvent.OnHealthChanged += HealthEvent_OnHealthChanged;
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe from player health event
+        healthEvent.OnHealthChanged -= HealthEvent_OnHealthChanged;
+
+        //Fix
+        if (isOwned)
+        {
+            setActiveWeaponEvent.OnSetActiveWeapon -= SetWeaponEvent_OnSetActiveWeapon;
+        }
+    }
+
+    // Handle health changed event
+    private void HealthEvent_OnHealthChanged(HealthEvent healthEvent, HealthEventArgs healthEventArgs)
+    {
+        // If player has died
+        if (healthEventArgs.healthAmount <= 0f)
+        {
+            destroyedEvent.CallDestroyedEvent(true, 0);
+        }
+
+    }
+
 
     // Set the player starting weapon
     private void CreatePlayerStartingWeapons()
@@ -100,10 +278,16 @@ public class Player : MonoBehaviour
         }
     }
 
-    // set player health from playerDetails SO
+    // Set player health from playerDetails SO
     private void SetPlayerHealth()
     {
         health.SetStartingHealth(playerDetails.playerHealthAmount);
+    }
+
+    // Returns the player position
+    public Vector3 GetPlayerPosition()
+    {
+        return transform.position;
     }
 
     // Add a weapon to the player weapon dictionary
@@ -124,4 +308,15 @@ public class Player : MonoBehaviour
 
     }
 
+    // Returns true if the weapon is held by the player - otherwise returns false
+    public bool IsWeaponHeldByPlayer(WeaponDetailsSO weaponDetails)
+    {
+
+        foreach (Weapon weapon in weaponList)
+        {
+            if (weapon.weaponDetails == weaponDetails) return true;
+        }
+
+        return false;
+    }
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class AimWeapon : MonoBehaviour
 {
+    Player player;
+
     #region Tooltip
     [Tooltip("Populate with the Transform from the child WeaponRotationPoint gameobject")]
     #endregion
@@ -15,36 +17,40 @@ public class AimWeapon : MonoBehaviour
 
     private void Awake()
     {
-        // load components
+        // Load components
         aimWeaponEvent = GetComponent<AimWeaponEvent>();
+
+        player = GetComponent<Player>();
     }
 
     private void OnEnable()
     {
-        // subscribe to aim weapon event
+        // Subscribe to aim weapon event
         aimWeaponEvent.OnWeaponAim += AimWeaponEvent_OnWeaponAim;
     }
 
     private void OnDisable()
     {
-        // unsubscribe from aim weapon event
+        // Unsubscribe from aim weapon event
         aimWeaponEvent.OnWeaponAim -= AimWeaponEvent_OnWeaponAim;
     }
 
-
-    // aim weapon event handler
+    // Aim weapon event handler
     private void AimWeaponEvent_OnWeaponAim(AimWeaponEvent aimWeaponEvent, AimWeaponEventArgs aimWeaponEventArgs)
     {
+        //fix
+        if (player != null && player.isOwned) player.AimWeaponEvent_OnWeaponAim(aimWeaponEventArgs);
+
         Aim(aimWeaponEventArgs.aimDirection, aimWeaponEventArgs.aimAngle);
     }
 
-    // aim the weapon
+    // Aim the weapon
     private void Aim(AimDirection aimDirection, float aimAngle)
     {
-        // set angle of the weapon transform
+        // Set angle of the weapon transform
         weaponRotationPointTransform.eulerAngles = new Vector3(0f, 0f, aimAngle);
 
-        // flip weapon transform based on player direction
+        // Flip weapon transform based on player direction
         switch (aimDirection)
         {
             case AimDirection.Left:
@@ -59,7 +65,9 @@ public class AimWeapon : MonoBehaviour
                 weaponRotationPointTransform.localScale = new Vector3(1f, 1f, 0f);
                 break;
         }
+
     }
+
 
     #region Validation
 #if UNITY_EDITOR
@@ -69,4 +77,5 @@ public class AimWeapon : MonoBehaviour
     }
 #endif
     #endregion
+
 }

@@ -1,121 +1,134 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 public class RoomNodeSO : ScriptableObject
 {
-    public string id;
-    public List<string> parentRoomNodeIds = new List<string>();
-    public List<string> childRoomNodeIds = new List<string>();
+    [HideInInspector] public string id;
+    [HideInInspector] public List<string> parentRoomNodeIDList = new List<string>();
+    [HideInInspector] public List<string> childRoomNodeIDList = new List<string>();
     [HideInInspector] public RoomNodeGraphSO roomNodeGraph;
     public RoomNodeTypeSO roomNodeType;
-    [HideInInspector] public RoomNodeTypeListSO roomNodeTypes;
+    [HideInInspector] public RoomNodeTypeListSO roomNodeTypeList;
 
+    #region Editor Code
+
+    // the following code should only be run in the Unity Editor
+#if UNITY_EDITOR
+
+    [HideInInspector] public Rect rect;
     [HideInInspector] public bool isLeftClickDragging = false;
     [HideInInspector] public bool isSelected = false;
 
-    #region Editor Code
-#if UNITY_EDITOR
-    [HideInInspector] public Rect rect;
-
-    public void Initialise(Rect rect, RoomNodeGraphSO roomNodeGraph, RoomNodeTypeSO roomNodeType)
+    /// <summary>
+    /// Initialise node
+    /// </summary>
+    public void Initialise(Rect rect, RoomNodeGraphSO nodeGraph, RoomNodeTypeSO roomNodeType)
     {
         this.rect = rect;
-        this.id = Guid.NewGuid().ToString(); // generate new guid
+        this.id = Guid.NewGuid().ToString();
         this.name = "RoomNode";
-        this.roomNodeGraph = roomNodeGraph;
+        this.roomNodeGraph = nodeGraph;
         this.roomNodeType = roomNodeType;
 
-        // load room node type list
-        roomNodeTypes = GameResources.Instance.roomNodeTypeList;
+        // Load room node type list
+        roomNodeTypeList = GameResources.Instance.roomNodeTypeList;
     }
 
-    public void Draw(GUIStyle roomNodeStyle)
+    /// <summary>
+    /// Draw node with the nodestyle
+    /// </summary>
+    public void Draw(GUIStyle nodeStyle)
     {
-        // draw node box using begin area
-        GUILayout.BeginArea(rect, roomNodeStyle);
+        //  Draw Node Box Using Begin Area
+        GUILayout.BeginArea(rect, nodeStyle);
 
+        // Start Region To Detect Popup Selection Changes
         EditorGUI.BeginChangeCheck();
 
-        // if room nodes has parent or room node is entrance => it can not change type.
-        if (parentRoomNodeIds.Count > 0 || roomNodeType.isEntrance)
+        // if the room node has a parent or is of type entrance then display a label else display a popup
+        if (parentRoomNodeIDList.Count > 0 || roomNodeType.isEntrance)
         {
-            EditorGUILayout.LabelField(roomNodeType.name);
-
-        } else
+            // Display a label that can't be changed
+            EditorGUILayout.LabelField(roomNodeType.roomNodeTypeName);
+        }
+        else
         {
-            // display popup
-            int selected = roomNodeTypes.roomNodeTypes.FindIndex(x => x == roomNodeType);
+            // Display a popup using the RoomNodeType name values that can be selected from (default to the currently set roomNodeType)
+            int selected = roomNodeTypeList.list.FindIndex(x => x == roomNodeType);
 
             int selection = EditorGUILayout.Popup("", selected, GetRoomNodeTypesToDisplay());
 
-            roomNodeType = roomNodeTypes.roomNodeTypes[selection];
+            roomNodeType = roomNodeTypeList.list[selection];
 
             // If the room type selection has changed making child connections potentially invalid
-            if (roomNodeTypes.roomNodeTypes[selected].isCorridor && !roomNodeTypes.roomNodeTypes[selection].isCorridor 
-                || !roomNodeTypes.roomNodeTypes[selected].isCorridor && roomNodeTypes.roomNodeTypes[selection].isCorridor 
-                || !roomNodeTypes.roomNodeTypes[selected].isBossRoom && roomNodeTypes.roomNodeTypes[selection].isBossRoom)
+            if (roomNodeTypeList.list[selected].isCorridor && !roomNodeTypeList.list[selection].isCorridor || !roomNodeTypeList.list[selected].isCorridor && roomNodeTypeList.list[selection].isCorridor || !roomNodeTypeList.list[selected].isBossRoom && roomNodeTypeList.list[selection].isBossRoom)
             {
-                // vẫn tạo được 2 boss room -> cần fix
-                // if a room node type has been changed and it already has children then delete child connect line since revalidate any
-                if (childRoomNodeIds.Count > 0)
+                // If a room node type has been changed and it already has children then delete the parent child links since we need to revalidate any
+                if (childRoomNodeIDList.Count > 0)
                 {
-                    // remove all child ids and parent ids
-                    for (int i = childRoomNodeIds.Count - 1; i >= 0; i--)
+                    for (int i = childRoomNodeIDList.Count - 1; i >= 0; i--)
                     {
-                        // get child
-                        RoomNodeSO childRoom = roomNodeGraph.GetRoomNodeById(childRoomNodeIds[i]);
+                        // Get child room node
+                        RoomNodeSO childRoomNode = roomNodeGraph.GetRoomNode(childRoomNodeIDList[i]);
 
-                        if (childRoom != null)
+                        // If the child room node is not null
+                        if (childRoomNode != null)
                         {
-                            // parent remove child id
-                            RemoveChildIdFromRoomNode(childRoom.id);
-                            // child remove parent id
-                            childRoom.RemoveParentIdFromRoomNode(id);
+                            // Remove childID from parent room node
+                            RemoveChildRoomNodeIDFromRoomNode(childRoomNode.id);
+
+                            // Remove parentID from child room node
+                            childRoomNode.RemoveParentRoomNodeIDFromRoomNode(id);
                         }
                     }
                 }
             }
-
         }
 
         if (EditorGUI.EndChangeCheck())
-        {
             EditorUtility.SetDirty(this);
-        }
-        
+
         GUILayout.EndArea();
     }
 
-    // get name of room node types to dispaly
+    /// <summary>
+    /// Populate a string array with the room node types to display that can be selected
+    /// </summary>
     public string[] GetRoomNodeTypesToDisplay()
     {
-        string[] roomNames = new string[roomNodeTypes.roomNodeTypes.Count];
+        string[] roomArray = new string[roomNodeTypeList.list.Count];
 
-        for(int i = 0; i < roomNodeTypes.roomNodeTypes.Count; i++)
+        for (int i = 0; i < roomNodeTypeList.list.Count; i++)
         {
-            if (roomNodeTypes.roomNodeTypes[i].displayInNodeGraphEditor)
+            if (roomNodeTypeList.list[i].displayInNodeGraphEditor)
             {
-                roomNames[i] = roomNodeTypes.roomNodeTypes[i].name;
+                roomArray[i] = roomNodeTypeList.list[i].roomNodeTypeName;
             }
         }
 
-        return roomNames;
+        return roomArray;
     }
 
+    /// <summary>
+    /// Process events for the node
+    /// </summary>
     public void ProcessEvents(Event currentEvent)
     {
         switch (currentEvent.type)
         {
+            // Process Mouse Down Events
             case EventType.MouseDown:
                 ProcessMouseDownEvent(currentEvent);
                 break;
 
+            // Process Mouse Up Events
             case EventType.MouseUp:
                 ProcessMouseUpEvent(currentEvent);
                 break;
 
+            // Process Mouse Drag Events
             case EventType.MouseDrag:
                 ProcessMouseDragEvent(currentEvent);
                 break;
@@ -125,15 +138,15 @@ public class RoomNodeSO : ScriptableObject
         }
     }
 
-    // process mouse down event
+    /// Process mouse down events
+    /// </summary>
     private void ProcessMouseDownEvent(Event currentEvent)
     {
         // left click down
-        if (currentEvent.button == 0) // left mouse press
+        if (currentEvent.button == 0)
         {
             ProcessLeftClickDownEvent();
         }
-
         // right click down
         else if (currentEvent.button == 1)
         {
@@ -141,35 +154,47 @@ public class RoomNodeSO : ScriptableObject
         }
     }
 
-    // process left click down event
+    /// <summary>
+    /// Process left click down event
+    /// </summary>
     private void ProcessLeftClickDownEvent()
     {
         Selection.activeObject = this;
 
-        // toggle node selection
+        // Toggle node selection
         if (isSelected == true)
-            isSelected = false;
-        else
-            isSelected = true;
-    }
-
-    // process right click down event
-    private void ProcessRightClickDownEvent(Event currentEvent)
-    {
-        roomNodeGraph.SetNodeToDrawConnectionLineStart(this, currentEvent.mousePosition);
-    }
-
-    // process mouse up event
-    private void ProcessMouseUpEvent(Event currentEvent)
-    {
-        // left mouse up
-        if (currentEvent.button == 0)
         {
-            ProcessLeftClickUpEvent(); 
+            isSelected = false;
+        }
+        else
+        {
+            isSelected = true;
         }
     }
 
-    // process left click up event
+    /// <summary>
+    /// Process right click down
+    ///
+    private void ProcessRightClickDownEvent(Event currentEvent)
+    {
+        roomNodeGraph.SetNodeToDrawConnectionLineFrom(this, currentEvent.mousePosition);
+    }
+
+    /// <summary>
+    /// Process mouse up event
+    /// </summary>
+    private void ProcessMouseUpEvent(Event currentEvent)
+    {
+        // If left click up
+        if (currentEvent.button == 0)
+        {
+            ProcessLeftClickUpEvent();
+        }
+    }
+
+    /// <summary>
+    /// Process left click up event
+    /// </summary>
     private void ProcessLeftClickUpEvent()
     {
         if (isLeftClickDragging)
@@ -178,17 +203,21 @@ public class RoomNodeSO : ScriptableObject
         }
     }
 
-    // process mouse drag event
+    /// <summary>
+    /// Process mouse drag event
+    /// </summary>
     private void ProcessMouseDragEvent(Event currentEvent)
     {
-        // mouse drag
-        if (currentEvent.button == 0) // use left mouse drag room node
+        // process left click drag event
+        if (currentEvent.button == 0)
         {
             ProcessLeftMouseDragEvent(currentEvent);
-        } 
+        }
     }
 
-    // process left mouse drag
+    /// <summary>
+    /// Process left mouse drag event
+    /// </summary>
     private void ProcessLeftMouseDragEvent(Event currentEvent)
     {
         isLeftClickDragging = true;
@@ -197,47 +226,53 @@ public class RoomNodeSO : ScriptableObject
         GUI.changed = true;
     }
 
-    // process drag room node
+    /// <summary>
+    /// Drag node
+    /// </summary>
     public void DragNode(Vector2 delta)
     {
         rect.position += delta;
         EditorUtility.SetDirty(this);
     }
 
-    // add child id to room node
-    public bool AddChildIdToRoomNode(string childId)
+    /// <summary>
+    /// Add childID to the node (returns true if the node has been added, false otherwise)
+    /// </summary>
+    public bool AddChildRoomNodeIDToRoomNode(string childID)
     {
-        if (IsChildRoomValid(childId)) // valid child room node
+        // Check child node can be added validly to parent
+        if (IsChildRoomValid(childID))
         {
-            childRoomNodeIds.Add(childId);
+            childRoomNodeIDList.Add(childID);
             return true;
         }
 
         return false;
-
     }
 
-    // Check the child node can be validly added to the parent node - return true if it can otherwise return false
+    /// <summary>
+    /// Check the child node can be validly added to the parent node - return true if it can otherwise return false
+    /// </summary>
     public bool IsChildRoomValid(string childID)
     {
         bool isConnectedBossNodeAlready = false;
         // Check if there is there already a connected boss room in the node graph
-        foreach (RoomNodeSO roomNode in roomNodeGraph.roomNodes)
+        foreach (RoomNodeSO roomNode in roomNodeGraph.roomNodeList)
         {
-            if (roomNode.roomNodeType.isBossRoom && roomNode.parentRoomNodeIds.Count > 0)
+            if (roomNode.roomNodeType.isBossRoom && roomNode.parentRoomNodeIDList.Count > 0)
                 isConnectedBossNodeAlready = true;
         }
 
         // if the child node has a type of boss room and there is already a connected boss room node then return false
-        if (roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isBossRoom && isConnectedBossNodeAlready)
+        if (roomNodeGraph.GetRoomNode(childID).roomNodeType.isBossRoom && isConnectedBossNodeAlready)
             return false;
 
         // If the child node has a type of none then return false
-        if (roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isNone)
+        if (roomNodeGraph.GetRoomNode(childID).roomNodeType.isNone)
             return false;
 
         // If the node already has a child with this child ID return false
-        if (childRoomNodeIds.Contains(childID))
+        if (childRoomNodeIDList.Contains(childID))
             return false;
 
         // If this node ID and the child ID are the same return false
@@ -245,72 +280,74 @@ public class RoomNodeSO : ScriptableObject
             return false;
 
         // If this childID is already in the parentID list return false
-        if (parentRoomNodeIds.Contains(childID))
+        if (parentRoomNodeIDList.Contains(childID))
             return false;
 
         // If the child node already has a parent return false
-        if (roomNodeGraph.GetRoomNodeById(childID).parentRoomNodeIds.Count > 0)
+        if (roomNodeGraph.GetRoomNode(childID).parentRoomNodeIDList.Count > 0)
             return false;
 
         // If child is a corridor and this node is a corridor return false
-        if (roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isCorridor && roomNodeType.isCorridor)
+        if (roomNodeGraph.GetRoomNode(childID).roomNodeType.isCorridor && roomNodeType.isCorridor)
             return false;
 
         // If child is not a corridor and this node is not a corridor return false
-        if (!roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isCorridor && !roomNodeType.isCorridor)
+        if (!roomNodeGraph.GetRoomNode(childID).roomNodeType.isCorridor && !roomNodeType.isCorridor)
             return false;
 
         // If adding a corridor check that this node has < the maximum permitted child corridors
-        if (roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isCorridor && childRoomNodeIds.Count >= Settings.maxChildCorridors)
+        if (roomNodeGraph.GetRoomNode(childID).roomNodeType.isCorridor && childRoomNodeIDList.Count >= Settings.maxChildCorridors)
             return false;
 
         // if the child room is an entrance return false - the entrance must always be the top level parent node
-        if (roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isEntrance)
+        if (roomNodeGraph.GetRoomNode(childID).roomNodeType.isEntrance)
             return false;
 
         // If adding a room to a corridor check that this corridor node doesn't already have a room added
-        if (!roomNodeGraph.GetRoomNodeById(childID).roomNodeType.isCorridor && childRoomNodeIds.Count > 0)
+        if (!roomNodeGraph.GetRoomNode(childID).roomNodeType.isCorridor && childRoomNodeIDList.Count > 0)
             return false;
 
         return true;
     }
 
-    // add parent id to room node
-    public bool AddParentIdToRoomNode(string parentId)
+    /// <summary>
+    /// Add parentID to the node (returns true if the node has been added, false otherwise)
+    /// </summary>
+    public bool AddParentRoomNodeIDToRoomNode(string parentID)
     {
-        parentRoomNodeIds.Add(parentId);
+        parentRoomNodeIDList.Add(parentID);
         return true;
     }
 
-    // remove child id
-    public bool RemoveChildIdFromRoomNode(string childId)
+    /// <summary>
+    /// Remove childID from the node (returns true if the node has been removed, false otherwise)
+    /// </summary>
+    public bool RemoveChildRoomNodeIDFromRoomNode(string childID)
     {
-        //if child id list of room node has childId => remove it
-        if (childRoomNodeIds.Contains(childId))
+        // if the node contains the child ID then remove it
+        if (childRoomNodeIDList.Contains(childID))
         {
-            childRoomNodeIds.Remove(childId);
-            return true;
-        } 
-
-        return false;
-    }
-
-    // remove parent id
-    public bool RemoveParentIdFromRoomNode(string parentId)
-    {
-        // if parent id list of room node has parentId => remove it
-        if (parentRoomNodeIds.Contains(parentId))
-        {
-            parentRoomNodeIds.Remove(parentId);
+            childRoomNodeIDList.Remove(childID);
             return true;
         }
-
         return false;
     }
 
-
-
+    /// <summary>
+    /// Remove parentID from the node (returns true if the node has been remove, false otherwise)
+    /// </summary>
+    public bool RemoveParentRoomNodeIDFromRoomNode(string parentID)
+    {
+        // if the node contains the parent ID then remove it
+        if (parentRoomNodeIDList.Contains(parentID))
+        {
+            parentRoomNodeIDList.Remove(parentID);
+            return true;
+        }
+        return false;
+    }
 
 #endif
+
     #endregion Editor Code
 }

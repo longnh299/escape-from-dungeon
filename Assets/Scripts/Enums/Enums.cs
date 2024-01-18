@@ -1,6 +1,5 @@
 ﻿public enum Orientation
 {
-    // save orientation of doorway
     north,
     east,
     south,
@@ -18,9 +17,29 @@ public enum AimDirection
     Down
 }
 
+public enum ChestSpawnEvent
+{
+    onRoomEntry,
+    onEnemiesDefeated
+}
+
+public enum ChestSpawnPosition
+{
+    atSpawnerPosition,
+    atPlayerPosition
+}
+
+public enum ChestState
+{
+    closed,
+    healthItem,
+    ammoItem,
+    weaponItem,
+    empty
+}
+
 public enum GameState
 {
-    // game state
     gameStarted,
     playingLevel,
     engagingEnemies,
@@ -33,4 +52,3 @@ public enum GameState
     dungeonOverviewMap,
     restartGame
 }
-

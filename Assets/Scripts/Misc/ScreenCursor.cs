@@ -14,4 +14,5 @@ public class ScreenCursor : MonoBehaviour
     {
         transform.position = Input.mousePosition;
     }
+
 }

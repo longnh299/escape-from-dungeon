@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
+using UnityEngine;
 
 [DisallowMultipleComponent]
 public class WeaponReloadedEvent : MonoBehaviour
@@ -13,6 +13,7 @@ public class WeaponReloadedEvent : MonoBehaviour
         OnWeaponReloaded?.Invoke(this, new WeaponReloadedEventArgs() { weapon = weapon });
     }
 }
+
 public class WeaponReloadedEventArgs : EventArgs
 {
     public Weapon weapon;

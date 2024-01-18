@@ -1,6 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -12,6 +12,7 @@ public class MovementByVelocityEvent : MonoBehaviour
     {
         OnMovementByVelocity?.Invoke(this, new MovementByVelocityArgs() { moveDirection = moveDirection, moveSpeed = moveSpeed });
     }
+
 }
 
 public class MovementByVelocityArgs : EventArgs
@@ -19,3 +20,4 @@ public class MovementByVelocityArgs : EventArgs
     public Vector2 moveDirection;
     public float moveSpeed;
 }
+

@@ -1,7 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class DoorLightingControl : MonoBehaviour
 {
     private bool isLit = false;

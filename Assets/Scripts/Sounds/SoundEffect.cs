@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
@@ -33,4 +31,5 @@ public class SoundEffect : MonoBehaviour
         audioSource.volume = soundEffect.soundEffectVolume;
         audioSource.clip = soundEffect.soundEffectClip;
     }
+
 }

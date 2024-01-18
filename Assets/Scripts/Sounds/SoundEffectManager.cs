@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -13,7 +12,7 @@ public class SoundEffectManager : SingletonMonobehaviour<SoundEffectManager>
         {
             soundsVolume = PlayerPrefs.GetInt("soundsVolume");
         }
-
+       
         SetSoundsVolume(soundsVolume);
     }
 
@@ -23,7 +22,7 @@ public class SoundEffectManager : SingletonMonobehaviour<SoundEffectManager>
         PlayerPrefs.SetInt("soundsVolume", soundsVolume);
     }
 
-    // Play the sound effect
+    //Play the sound effect
     public void PlaySoundEffect(SoundEffectSO soundEffect)
     {
         // Play sound using a sound gameobject and component from the object pool
@@ -34,16 +33,14 @@ public class SoundEffectManager : SingletonMonobehaviour<SoundEffectManager>
 
     }
 
-
-    // Disable sound effect object after it has played thus returning it to the object pool
+// Disable sound effect object after it has played thus returning it to the object pool
     private IEnumerator DisableSound(SoundEffect sound, float soundDuration)
     {
         yield return new WaitForSeconds(soundDuration);
         sound.gameObject.SetActive(false);
     }
 
-   
-    // Increase sounds volume
+   // Increase sounds volume
     public void IncreaseSoundsVolume()
     {
         int maxSoundsVolume = 20;
@@ -55,7 +52,6 @@ public class SoundEffectManager : SingletonMonobehaviour<SoundEffectManager>
         SetSoundsVolume(soundsVolume); ;
     }
 
-
     // Decrease sounds volume
     public void DecreaseSoundsVolume()
     {
@@ -66,7 +62,8 @@ public class SoundEffectManager : SingletonMonobehaviour<SoundEffectManager>
         SetSoundsVolume(soundsVolume);
     }
 
-    // Set sounds volume
+    
+// Set sounds volume
     private void SetSoundsVolume(int soundsVolume)
     {
         float muteDecibels = -80f;

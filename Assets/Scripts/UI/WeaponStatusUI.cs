@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class WeaponStatusUI : MonoBehaviour
@@ -14,17 +14,14 @@ public class WeaponStatusUI : MonoBehaviour
     [Tooltip("Populate with image component on the child WeaponImage gameobject")]
     #endregion Tooltip
     [SerializeField] private Image weaponImage;
-
     #region Tooltip
     [Tooltip("Populate with the Transform from the child AmmoHolder gameobject")]
     #endregion Tooltip
     [SerializeField] private Transform ammoHolderTransform;
-
     #region Tooltip
     [Tooltip("Populate with the TextMeshPro-Text component on the child ReloadText gameobject")]
     #endregion Tooltip
     [SerializeField] private TextMeshProUGUI reloadText;
-
     #region Tooltip
     [Tooltip("Populate with the TextMeshPro-Text component on the child AmmoRemainingText gameobject")]
     #endregion Tooltip
@@ -161,6 +158,7 @@ public class WeaponStatusUI : MonoBehaviour
         weaponImage.sprite = weaponDetails.weaponSprite;
     }
 
+
     // Populate active weapon name
     private void UpdateActiveWeaponName(Weapon weapon)
     {
@@ -180,7 +178,7 @@ public class WeaponStatusUI : MonoBehaviour
         }
     }
 
-    /// Update ammo clip icons on the UI
+    // Update ammo clip icons on the UI
     private void UpdateAmmoLoadedIcons(Weapon weapon)
     {
         ClearAmmoLoadedIcons();
@@ -196,7 +194,7 @@ public class WeaponStatusUI : MonoBehaviour
         }
     }
 
-    // Clear ammo icons
+// Clear ammo icons
     private void ClearAmmoLoadedIcons()
     {
         // Loop through icon gameobjects and destroy
@@ -208,7 +206,7 @@ public class WeaponStatusUI : MonoBehaviour
         ammoIconList.Clear();
     }
 
-    // Reload weapon - update the reload bar on the UI
+    //Reload weapon - update the reload bar on the UI
     private void UpdateWeaponReloadBar(Weapon weapon)
     {
         if (weapon.weaponDetails.hasInfiniteClipCapacity)
@@ -324,5 +322,4 @@ public class WeaponStatusUI : MonoBehaviour
 
 #endif
     #endregion Validation
-
 }

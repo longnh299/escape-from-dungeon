@@ -1,19 +1,16 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 [DisallowMultipleComponent]
 public class PoolManager : SingletonMonobehaviour<PoolManager>
 {
-
     #region Tooltip
     [Tooltip("Populate this array with prefabs that you want to add to the pool, and specify the number of gameobjects to be created for each.")]
     #endregion
     [SerializeField] private Pool[] poolArray = null;
     private Transform objectPoolTransform;
-    private Dictionary<int, Queue<Component>> poolDictionary = new Dictionary<int, Queue<Component>>(); // use to save multiple pool (each pool save a type of game object)
-
+    private Dictionary<int, Queue<Component>> poolDictionary = new Dictionary<int, Queue<Component>>();
 
     [System.Serializable]
     public struct Pool
@@ -85,7 +82,7 @@ public class PoolManager : SingletonMonobehaviour<PoolManager>
         }
     }
 
-    // Get a gameobject component from the pool using the 'poolKey'
+    //Get a gameobject component from the pool using the 'poolKey'
     private Component GetComponentFromPool(int poolKey)
     {
         Component componentToReuse = poolDictionary[poolKey].Dequeue();
@@ -99,7 +96,7 @@ public class PoolManager : SingletonMonobehaviour<PoolManager>
         return componentToReuse;
     }
 
-    // Reset the gameobject.
+    //Reset the gameobject.
     private void ResetObject(Vector3 position, Quaternion rotation, Component componentToReuse, GameObject prefab)
     {
         componentToReuse.transform.position = position;
@@ -111,7 +108,7 @@ public class PoolManager : SingletonMonobehaviour<PoolManager>
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        HelperUtilities.IsEnumerableValues(this, nameof(poolArray), poolArray);
+        HelperUtilities.ValidateCheckEnumerableValues(this, nameof(poolArray), poolArray);
     }
 #endif
     #endregion

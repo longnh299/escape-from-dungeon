@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -19,6 +17,7 @@ public class Ammo : MonoBehaviour, IFireable
     private float ammoChargeTimer;
     private bool isAmmoMaterialSet = false;
     private bool overrideAmmoMovement;
+    private bool isColliding = false;
 
     private void Awake()
     {
@@ -40,31 +39,94 @@ public class Ammo : MonoBehaviour, IFireable
             isAmmoMaterialSet = true;
         }
 
-        // Calculate distance vector to move ammo
-        Vector3 distanceVector = fireDirectionVector * ammoSpeed * Time.deltaTime;
-
-        transform.position += distanceVector;
-
-        // Disable after max range reached
-        ammoRange -= distanceVector.magnitude;
-
-        if (ammoRange < 0f) // when ammo go to max => disable ammo
+        // Don't move ammo if movement has been overriden - e.g. this ammo is part of an ammo pattern
+        if (!overrideAmmoMovement)
         {
-            DisableAmmo();
+            // Calculate distance vector to move ammo
+            Vector3 distanceVector = fireDirectionVector * ammoSpeed * Time.deltaTime;
+
+            transform.position += distanceVector;
+
+            // Disable after max range reached
+            ammoRange -= distanceVector.magnitude;
+
+            if (ammoRange < 0f)
+            {
+                if (ammoDetails.isPlayerAmmo)
+                {
+                    // no multiplier
+                    StaticEventHandler.CallMultiplierEvent(false);
+                }
+
+                DisableAmmo();
+            }
         }
 
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // If already colliding with something return
+        if (isColliding) return;
+
+        // Deal Damage To Collision Object
+        DealDamage(collision);
+
+        // Show ammo hit effect
+        AmmoHitEffect();
+
         DisableAmmo();
     }
 
+    private void DealDamage(Collider2D collision)
+    {
+        Health health = collision.GetComponent<Health>();
+
+        bool enemyHit = false;
+
+        if (health != null)
+        {
+            // Set isColliding to prevent ammo dealing damage multiple times
+            isColliding = true;
+
+            health.TakeDamage(ammoDetails.ammoDamage);
+
+            // Enemy hit
+            if (health.enemy != null)
+            {
+                enemyHit = true;
+            }
+        }
+
+        // If player ammo then update multiplier
+        if (ammoDetails.isPlayerAmmo)
+        {
+            if (enemyHit)
+            {
+                // multiplier
+                StaticEventHandler.CallMultiplierEvent(true);
+            }
+            else
+            {
+                // no multiplier
+                StaticEventHandler.CallMultiplierEvent(false);
+            }
+        }
+
+    }
+
+
+    // Initialise the ammo being fired - using the ammodetails, the aimangle, weaponAngle, and
+    // weaponAimDirectionVector. If this ammo is part of a pattern the ammo movement can be
+    // overriden by setting overrideAmmoMovement to true
     public void InitialiseAmmo(AmmoDetailsSO ammoDetails, float aimAngle, float weaponAimAngle, float ammoSpeed, Vector3 weaponAimDirectionVector, bool overrideAmmoMovement = false)
     {
         #region Ammo
 
         this.ammoDetails = ammoDetails;
+
+        // Initialise isColliding
+        isColliding = false;
 
         // Set fire direction
         SetFireDirection(ammoDetails, aimAngle, weaponAimAngle, weaponAimDirectionVector);
@@ -101,6 +163,7 @@ public class Ammo : MonoBehaviour, IFireable
 
         #endregion Ammo
 
+
         #region Trail
 
         if (ammoDetails.isAmmoTrail)
@@ -119,6 +182,7 @@ public class Ammo : MonoBehaviour, IFireable
         }
 
         #endregion Trail
+
     }
 
     // Set ammo fire direction and angle based on the input angle and direction adjusted by the
@@ -157,10 +221,30 @@ public class Ammo : MonoBehaviour, IFireable
         gameObject.SetActive(false);
     }
 
+    // Display the ammo hit effect
+    private void AmmoHitEffect()
+    {
+        // Process if a hit effect has been specified
+        if (ammoDetails.ammoHitEffect != null && ammoDetails.ammoHitEffect.ammoHitEffectPrefab != null)
+        {
+            // Get ammo hit effect gameobject from the pool (with particle system component)
+            AmmoHitEffect ammoHitEffect = (AmmoHitEffect)PoolManager.Instance.ReuseComponent(ammoDetails.ammoHitEffect.ammoHitEffectPrefab, transform.position, Quaternion.identity);
+
+            // Set Hit Effect
+            ammoHitEffect.SetHitEffect(ammoDetails.ammoHitEffect);
+
+            // Set gameobject active (the particle system is set to automatically disable the
+            // gameobject once finished)
+            ammoHitEffect.gameObject.SetActive(true);
+        }
+    }
+
+
     public void SetAmmoMaterial(Material material)
     {
         spriteRenderer.material = material;
     }
+
 
     public GameObject GetGameObject()
     {

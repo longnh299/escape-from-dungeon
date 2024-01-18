@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WeaponDetails_", menuName = "Scriptable Objects/Weapons/Weapon Details")]
@@ -26,22 +24,22 @@ public class WeaponDetailsSO : ScriptableObject
     [Tooltip("Weapon Shoot Position - the offset position for the end of the weapon from the sprite pivot pont")]
     #endregion Tooltip
     public Vector3 weaponShootPosition;
-    
     #region Tooltip
     [Tooltip("Weapon current ammo")]
     #endregion Tooltip
     public AmmoDetailsSO weaponCurrentAmmo;
-
+    #region Tooltip
+    [Tooltip("Weapon shoot effect SO - contains particle effecct parameters to be used in conjunction with the weaponShootEffectPrefab ")]
+    #endregion Tooltip
+    public WeaponShootEffectSO weaponShootEffect;
     #region Tooltip
     [Tooltip("The firing sound effect SO for the weapon")]
     #endregion Tooltip
     public SoundEffectSO weaponFiringSoundEffect;
-
     #region Tooltip
     [Tooltip("The reloading sound effect SO for the weapon")]
     #endregion Tooltip
     public SoundEffectSO weaponReloadingSoundEffect;
-
     #region Header WEAPON OPERATING VALUES
     [Space(10)]
     [Header("WEAPON OPERATING VALUES")]
@@ -49,7 +47,7 @@ public class WeaponDetailsSO : ScriptableObject
     #region Tooltip
     [Tooltip("Select if the weapon has infinite ammo")]
     #endregion Tooltip
-    public bool hasInfiniteAmmo = false; // is weapon has infinite ammo?
+    public bool hasInfiniteAmmo = false;
     #region Tooltip
     [Tooltip("Select if the weapon has infinite clip capacity")]
     #endregion Tooltip
@@ -80,7 +78,7 @@ public class WeaponDetailsSO : ScriptableObject
 
     private void OnValidate()
     {
-        HelperUtilities.IsEmptyString(this, nameof(weaponName), weaponName);
+        HelperUtilities.ValidateCheckEmptyString(this, nameof(weaponName), weaponName);
         HelperUtilities.ValidateCheckNullValue(this, nameof(weaponCurrentAmmo), weaponCurrentAmmo);
         HelperUtilities.ValidateCheckPositiveValue(this, nameof(weaponFireRate), weaponFireRate, false);
         HelperUtilities.ValidateCheckPositiveValue(this, nameof(weaponPrechargeTime), weaponPrechargeTime, true);

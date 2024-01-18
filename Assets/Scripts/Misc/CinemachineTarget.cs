@@ -1,7 +1,7 @@
-using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 [RequireComponent(typeof(CinemachineTargetGroup))]
 public class CinemachineTarget : MonoBehaviour
@@ -15,17 +15,17 @@ public class CinemachineTarget : MonoBehaviour
 
     private void Awake()
     {
-        // load components
+        // Load components
         cinemachineTargetGroup = GetComponent<CinemachineTargetGroup>();
     }
 
-    // start is called before the first frame update
+    // Start is called before the first frame update
     void Start()
     {
         SetCinemachineTargetGroup();
     }
 
-    // set the cinemachine camera target group.
+    // Set the cinemachine camera target group.
     private void SetCinemachineTargetGroup()
     {
         // Create target group for cinemachine for the cinemachine camera to follow  - group will include the player and screen cursor

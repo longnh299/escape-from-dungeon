@@ -32,6 +32,14 @@ public class PlayerDetailsSO : ScriptableObject
     [Tooltip("Player starting health amount")]
     #endregion
     public int playerHealthAmount;
+    #region Tooltip
+    [Tooltip("Select if has immunity period immediately after being hit.  If so specify the immunity time in seconds in the other field")]
+    #endregion
+    public bool isImmuneAfterHit = false;
+    #region Tooltip
+    [Tooltip("Immunity time in seconds after being hit")]
+    #endregion
+    public float hitImmunityTime;
 
     #region Header WEAPON
     [Space(10)]
@@ -40,7 +48,7 @@ public class PlayerDetailsSO : ScriptableObject
     #region Tooltip
     [Tooltip("Player  initial starting weapon")]
     #endregion
-    public WeaponDetailsSO startingWeapon; // default weapon when starting game
+    public WeaponDetailsSO startingWeapon;
     #region Tooltip
     [Tooltip("Populate with the list of starting weapons")]
     #endregion
@@ -64,15 +72,21 @@ public class PlayerDetailsSO : ScriptableObject
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        HelperUtilities.IsEmptyString(this, nameof(playerCharacterName), playerCharacterName);
+        HelperUtilities.ValidateCheckEmptyString(this, nameof(playerCharacterName), playerCharacterName);
         HelperUtilities.ValidateCheckNullValue(this, nameof(playerPrefab), playerPrefab);
-        HelperUtilities.ValidateCheckPositiveValue(this, nameof(playerHealthAmount), playerHealthAmount, false); // check health > 0 ?
+        HelperUtilities.ValidateCheckPositiveValue(this, nameof(playerHealthAmount), playerHealthAmount, false);
+        HelperUtilities.ValidateCheckNullValue(this, nameof(startingWeapon), startingWeapon);
         HelperUtilities.ValidateCheckNullValue(this, nameof(playerMiniMapIcon), playerMiniMapIcon);
         HelperUtilities.ValidateCheckNullValue(this, nameof(playerHandSprite), playerHandSprite);
         HelperUtilities.ValidateCheckNullValue(this, nameof(runtimeAnimatorController), runtimeAnimatorController);
-        HelperUtilities.ValidateCheckNullValue(this, nameof(startingWeapon), startingWeapon);
-        HelperUtilities.IsEnumerableValues(this, nameof(startingWeaponList), startingWeaponList);
+        HelperUtilities.ValidateCheckEnumerableValues(this, nameof(startingWeaponList), startingWeaponList);
+
+        if (isImmuneAfterHit)
+        {
+            HelperUtilities.ValidateCheckPositiveValue(this, nameof(hitImmunityTime), hitImmunityTime, false);
+        }
     }
 #endif
     #endregion
+
 }

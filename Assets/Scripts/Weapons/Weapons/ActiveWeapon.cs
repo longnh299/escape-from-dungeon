@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,6 +24,7 @@ public class ActiveWeapon : MonoBehaviour
 
     private SetActiveWeaponEvent setWeaponEvent;
     private Weapon currentWeapon;
+
 
     private void Awake()
     {
@@ -106,4 +106,5 @@ public class ActiveWeapon : MonoBehaviour
     }
 #endif
     #endregion
+
 }

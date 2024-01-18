@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -35,9 +33,7 @@ public class MovementToPosition : MonoBehaviour
         MoveRigidBody(movementToPositionArgs.movePosition, movementToPositionArgs.currentPosition, movementToPositionArgs.moveSpeed);
     }
 
-    /// <summary>
-    /// Move the rigidbody component
-    /// </summary>
+    // Move the rigidbody component
     private void MoveRigidBody(Vector3 movePosition, Vector3 currentPosition, float moveSpeed)
     {
         Vector2 unitVector = Vector3.Normalize(movePosition - currentPosition);

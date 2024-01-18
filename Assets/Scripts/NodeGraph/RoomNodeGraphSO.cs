@@ -5,21 +5,45 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "RoomNodeGraph", menuName = "Scriptable Objects/Dungeon/Room Node Graph")]
 public class RoomNodeGraphSO : ScriptableObject
 {
-    [HideInInspector] public RoomNodeTypeListSO roomNodeTypes;
-    [HideInInspector] public List<RoomNodeSO> roomNodes = new List<RoomNodeSO>();
+    [HideInInspector] public RoomNodeTypeListSO roomNodeTypeList;
+    [HideInInspector] public List<RoomNodeSO> roomNodeList = new List<RoomNodeSO>();
     [HideInInspector] public Dictionary<string, RoomNodeSO> roomNodeDictionary = new Dictionary<string, RoomNodeSO>();
 
-    /* public RoomNodeSO GetRoomNodeById(string id)
-     {
-         foreach (RoomNodeSO roomNode in roomNodes)
-         {
-             if (roomNode.id == id)
-             { return roomNode; }
-         }
-         return null;
-     } */
+    private void Awake()
+    {
+        LoadRoomNodeDictionary();
 
-    public RoomNodeSO GetRoomNodeById(string roomNodeID)
+    }
+
+    // Load the room node dictionary from the room node list.
+    private void LoadRoomNodeDictionary()
+    {
+        roomNodeDictionary.Clear();
+
+        // Populate dictionary
+        foreach (RoomNodeSO node in roomNodeList)
+        {
+            roomNodeDictionary[node.id] = node;
+        }
+    }
+
+
+    // Get room node by roomNodeType
+    public RoomNodeSO GetRoomNode(RoomNodeTypeSO roomNodeType)
+    {
+        foreach (RoomNodeSO node in roomNodeList)
+        {
+            if (node.roomNodeType == roomNodeType)
+            {
+                return node;
+            }
+        }
+        return null;
+    }
+
+
+    // Get room node by room nodeID
+    public RoomNodeSO GetRoomNode(string roomNodeID)
     {
         if (roomNodeDictionary.TryGetValue(roomNodeID, out RoomNodeSO roomNode))
         {
@@ -28,61 +52,38 @@ public class RoomNodeGraphSO : ScriptableObject
         return null;
     }
 
-    // get child room node
+    // Get child room nodes for supplied parent room node
     public IEnumerable<RoomNodeSO> GetChildRoomNodes(RoomNodeSO parentRoomNode)
     {
-        foreach (string childNodeID in parentRoomNode.childRoomNodeIds)
+        foreach (string childNodeID in parentRoomNode.childRoomNodeIDList)
         {
-            yield return GetRoomNodeById(childNodeID);
+            yield return GetRoomNode(childNodeID);
         }
     }
 
-    public void Awake()
-    {
-        // init room node dictionary
-        LoadRoomNodeDictionary();
-    }
-
-    // load room node dictionary from room node list
-    private void LoadRoomNodeDictionary()
-    {
-        roomNodeDictionary.Clear();
-        foreach(RoomNodeSO room in roomNodes)
-        {
-            roomNodeDictionary[room.id] = room;
-        }
-
-    }
-
-    // get room node by room type
-    public RoomNodeSO getRoomNode(RoomNodeTypeSO roomType)
-    {
-        foreach(RoomNodeSO roomNode in roomNodes)
-        {
-            if(roomNode.roomNodeType == roomType)
-            {
-                return roomNode;
-            }
-        }
-        return null;
-    }
 
     #region Editor Code
-#if UNITY_EDITOR
-    [HideInInspector] public RoomNodeSO roomNodeDrawLineStart = null;
-    [HideInInspector] public Vector2 linePostion;
 
-    // recaculate dictionary every time has change in room node grah editor
+    // The following code should only run in the Unity Editor
+#if UNITY_EDITOR
+
+    [HideInInspector] public RoomNodeSO roomNodeToDrawLineFrom = null;
+    [HideInInspector] public Vector2 linePosition;
+
+    // Repopulate node dictionary every time a change is made in the editor
     public void OnValidate()
     {
         LoadRoomNodeDictionary();
     }
 
-    public void SetNodeToDrawConnectionLineStart(RoomNodeSO roomNode, Vector2 position)
+    public void SetNodeToDrawConnectionLineFrom(RoomNodeSO node, Vector2 position)
     {
-        roomNodeDrawLineStart = roomNode;
-        linePostion = position;
+        roomNodeToDrawLineFrom = node;
+        linePosition = position;
     }
+
 #endif
+
     #endregion Editor Code
+
 }

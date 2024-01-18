@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SoundEffect_", menuName = "Scriptable Objects/Sounds/SoundEffect")]
@@ -41,7 +39,7 @@ public class SoundEffectSO : ScriptableObject
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        HelperUtilities.IsEmptyString(this, nameof(soundEffectName), soundEffectName);
+        HelperUtilities.ValidateCheckEmptyString(this, nameof(soundEffectName), soundEffectName);
         HelperUtilities.ValidateCheckNullValue(this, nameof(soundPrefab), soundPrefab);
         HelperUtilities.ValidateCheckNullValue(this, nameof(soundEffectClip), soundEffectClip);
         HelperUtilities.ValidateCheckPositiveRange(this, nameof(soundEffectPitchRandomVariationMin), soundEffectPitchRandomVariationMin, nameof(soundEffectPitchRandomVariationMax), soundEffectPitchRandomVariationMax, false);

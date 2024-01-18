@@ -1,11 +1,10 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(ActiveWeapon))]
 [RequireComponent(typeof(FireWeaponEvent))]
-[RequireComponent(typeof(WeaponFiredEvent))]
 [RequireComponent(typeof(ReloadWeaponEvent))]
+[RequireComponent(typeof(WeaponFiredEvent))]
 [DisallowMultipleComponent]
 public class FireWeapon : MonoBehaviour
 {
@@ -13,16 +12,20 @@ public class FireWeapon : MonoBehaviour
     private float fireRateCoolDownTimer = 0f;
     private ActiveWeapon activeWeapon;
     private FireWeaponEvent fireWeaponEvent;
-    private WeaponFiredEvent weaponFiredEvent;
     private ReloadWeaponEvent reloadWeaponEvent;
+    private WeaponFiredEvent weaponFiredEvent;
+    Player player;
+    Enemy enemy;
 
     private void Awake()
     {
         // Load components.
         activeWeapon = GetComponent<ActiveWeapon>();
         fireWeaponEvent = GetComponent<FireWeaponEvent>();
-        weaponFiredEvent = GetComponent<WeaponFiredEvent>();
         reloadWeaponEvent = GetComponent<ReloadWeaponEvent>();
+        weaponFiredEvent = GetComponent<WeaponFiredEvent>();
+        player = GetComponent<Player>();
+        enemy = GetComponent<Enemy>();
     }
 
     private void OnEnable()
@@ -43,7 +46,7 @@ public class FireWeapon : MonoBehaviour
         fireRateCoolDownTimer -= Time.deltaTime;
     }
 
-    // Handle fire weapon event.
+    //Handle fire weapon event.
     private void FireWeaponEvent_OnFireWeapon(FireWeaponEvent fireWeaponEvent, FireWeaponEventArgs fireWeaponEventArgs)
     {
         WeaponFire(fireWeaponEventArgs);
@@ -52,7 +55,6 @@ public class FireWeapon : MonoBehaviour
     // Fire weapon.
     private void WeaponFire(FireWeaponEventArgs fireWeaponEventArgs)
     {
-
         // Handle weapon precharge timer.
         WeaponPreCharge(fireWeaponEventArgs);
 
@@ -62,12 +64,14 @@ public class FireWeapon : MonoBehaviour
             // Test if weapon is ready to fire.
             if (IsWeaponReadyToFire())
             {
+                if(player != null && player.isOwned) player.FireWeaponEvent_OnFireWeapon(fireWeaponEventArgs);
+                else if(enemy != null && enemy.isOwned) enemy.FireWeaponEvent_OnFireWeapon(fireWeaponEventArgs);
+
                 FireAmmo(fireWeaponEventArgs.aimAngle, fireWeaponEventArgs.weaponAimAngle, fireWeaponEventArgs.weaponAimDirectionVector);
 
                 ResetCoolDownTimer();
 
                 ResetPrechargeTimer();
-
             }
         }
     }
@@ -91,6 +95,8 @@ public class FireWeapon : MonoBehaviour
     // Returns true if the weapon is ready to fire, else returns false.
     private bool IsWeaponReadyToFire()
     {
+        if(player != null && !player.isOwned) return true; 
+
         // if there is no ammo and weapon doesn't have infinite ammo then return false.
         if (activeWeapon.GetCurrentWeapon().weaponRemainingAmmo <= 0 && !activeWeapon.GetCurrentWeapon().weaponDetails.hasInfiniteAmmo)
             return false;
@@ -116,7 +122,7 @@ public class FireWeapon : MonoBehaviour
         return true;
     }
 
-    // Set up ammo using an ammo gameobject and component from the object pool.
+    //Set up ammo using an ammo gameobject and component from the object pool.
     private void FireAmmo(float aimAngle, float weaponAimAngle, Vector3 weaponAimDirectionVector)
     {
         AmmoDetailsSO currentAmmo = activeWeapon.GetCurrentAmmo();
@@ -180,40 +186,10 @@ public class FireWeapon : MonoBehaviour
         weaponFiredEvent.CallWeaponFiredEvent(activeWeapon.GetCurrentWeapon());
 
         // Display weapon shoot effect
-       // WeaponShootEffect(aimAngle);
+        WeaponShootEffect(aimAngle);
 
         // Weapon fired sound effect
         WeaponSoundEffect();
-
-    }
-
-    /*
-    // Display the weapon shoot effect
-    private void WeaponShootEffect(float aimAngle)
-    {
-        // Process if there is a shoot effect & prefab
-        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect != null && activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab != null)
-        {
-            // Get weapon shoot effect gameobject from the pool with particle system component
-            WeaponShootEffect weaponShootEffect = (WeaponShootEffect)PoolManager.Instance.ReuseComponent(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab, activeWeapon.GetShootEffectPosition(), Quaternion.identity);
-
-            // Set shoot effect
-            weaponShootEffect.SetShootEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect, aimAngle);
-
-            // Set gameobject active (the particle system is set to automatically disable the
-            // gameobject once finished)
-            weaponShootEffect.gameObject.SetActive(true);
-        }
-    }
-    */
-
-    // Play weapon shooting sound effect
-    private void WeaponSoundEffect()
-    {
-        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponFiringSoundEffect != null)
-        {
-            SoundEffectManager.Instance.PlaySoundEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponFiringSoundEffect);
-        }
     }
 
     // Reset cooldown timer
@@ -230,4 +206,30 @@ public class FireWeapon : MonoBehaviour
         firePreChargeTimer = activeWeapon.GetCurrentWeapon().weaponDetails.weaponPrechargeTime;
     }
 
+// Display the weapon shoot effect
+    private void WeaponShootEffect(float aimAngle)
+    {
+        // Process if there is a shoot effect & prefab
+        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect != null && activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab != null)
+        {
+            // Get weapon shoot effect gameobject from the pool with particle system component
+            WeaponShootEffect weaponShootEffect = (WeaponShootEffect)PoolManager.Instance.ReuseComponent(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect.weaponShootEffectPrefab, activeWeapon.GetShootEffectPosition(), Quaternion.identity);
+
+            // Set shoot effect
+            weaponShootEffect.SetShootEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponShootEffect, aimAngle);
+
+            // Set gameobject active (the particle system is set to automatically disable the
+            // gameobject once finished)
+            weaponShootEffect.gameObject.SetActive(true);
+        }
+    }
+
+    // Play weapon shooting sound effect
+    private void WeaponSoundEffect()
+    {
+        if (activeWeapon.GetCurrentWeapon().weaponDetails.weaponFiringSoundEffect != null)
+        {
+            SoundEffectManager.Instance.PlaySoundEffect(activeWeapon.GetCurrentWeapon().weaponDetails.weaponFiringSoundEffect);
+        }
+    }
 }

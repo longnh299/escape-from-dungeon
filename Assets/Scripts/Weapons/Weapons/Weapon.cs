@@ -1,5 +1,6 @@
 using UnityEngine;
-public class Weapon 
+
+public class Weapon
 {
     public WeaponDetailsSO weaponDetails;
     public int weaponListPosition;

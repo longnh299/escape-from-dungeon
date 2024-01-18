@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(ReloadWeaponEvent))]
 [RequireComponent(typeof(WeaponReloadedEvent))]
 [RequireComponent(typeof(SetActiveWeaponEvent))]
+
 [DisallowMultipleComponent]
 public class ReloadWeapon : MonoBehaviour
 {
@@ -134,5 +135,6 @@ public class ReloadWeapon : MonoBehaviour
             reloadWeaponCoroutine = StartCoroutine(ReloadWeaponRoutine(setActiveWeaponEventArgs.weapon, 0));
         }
     }
+
 
 }
