@@ -41,5 +41,3 @@
  + làm tiếp 2 phần thiết kế gameplay
  + xem góp ý của cô về phần chương 5 đồng bộ hóa.
 
-- làm theo bố cục của Chiến và Nam, đặc biệt thêm phần giới thiệu về game như của Chiến.
-- xem video udemy đạon làm Astar
